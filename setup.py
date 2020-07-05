@@ -1,22 +1,35 @@
 import os
 import sys
+import argparse
 import re
 from zipfile import ZipFile
 
 from src.utils.get_labelsmask import get_labels
 from src.utils.run_preprocessing import run
 
-UNZIP = True
-LABELS = True
-PREPROCESSING = True
-DATA_ZIPFILE = 'data/cubic.zip'
+parser = argparse.ArgumentParser()
+# Data structure arguments
+parser.add_argument("-file", "--file", type=str, default="cubic.zip",
+                    help="Name of zipped data file.")
+parser.add_argument("-unzip", "--unzip", type=bool, default=True,
+                    help="Unzip?")
+parser.add_argument("-labels", "--labels", type=bool, default=True,
+                    help="Convert annotations to labels?")
+parser.add_argument("-preprocessing", "--preprocessing", type=bool, default=True,
+                    help="Preprocessing?.")
+args = parser.parse_args()
+
+UNZIP = args.unzip
+LABELS = args.labels
+PREPROCESSING = args.preprocessing
+DATA_ZIPFILE = f'data/{args.file}'
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
 cwd = os.getcwd()
 
-# Overwrite DATA_ZIPFILE with parsing argument
-if len(sys.argv) == 2:
-    DATA_ZIPFILE = sys.argv[-1]
+# # Overwrite DATA_ZIPFILE with parsing argument
+# if len(sys.argv) == 2:
+#     DATA_ZIPFILE = sys.argv[-1]
 
 # Specify Directories where data is or is going to be
 parent_dir, name, image_format = re.split('\.|\/', DATA_ZIPFILE)

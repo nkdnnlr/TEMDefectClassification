@@ -1,5 +1,7 @@
 import os
 import sys
+import argparse
+
 import numpy as np
 np.set_printoptions(threshold=sys.maxsize)
 import tqdm
@@ -17,7 +19,7 @@ from src.utils.eigenfiltering import eigenfiltering
 from src.utils.preprocessing import preprocess_image
 
 
-def run(parent_dir, model, output_dir):
+def run(parent_dir, model, output_dir, TARGET_SIZE = 128):
     """
     Segmentation with Eigenfilters
     :param parent_dir:
@@ -92,14 +94,10 @@ def run(parent_dir, model, output_dir):
 
             # FILTER FOR LOCAL VARIANCE
             localvariance = helpers.localvariance_filter(image=image)
-            print("hi?")
             # SEGMENTING: GET BEST PATCH AND USE IT AS AN EIGENFILTER ON THE IMAGE
             startingtime = time.time()
             filtered = eigenfiltering(image_def=image, patch_good=best_patch, output_path=os.path.join(output_dir,
                                                                                                        'eigenfilters', name))
-            print("FILTERINGTIME: ", time.time() - startingtime)
-            continue
-            print("hi!")
             maxfiltered = np.max(filtered)
 
             # SAVE PLOTS
@@ -130,25 +128,27 @@ def run(parent_dir, model, output_dir):
 
 
 if __name__ == '__main__':
-    TARGET_SIZE = 128
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-image_dir", "--image_dir", type=str, default="cubic/defective/images",
+                        help="Name of image directory")
+    parser.add_argument("-model", "--model", type=str, default="20191208-014141.h5",
+                        help="Name of model file.")
+    parser.add_argument("-output_dir", "--output_dir", type=str, default="eigenfilter_segmentation",
+                        help="Name of model file.")
+    args = parser.parse_args()
 
-    defective_dir = "../data/cubic/defective/images/"
-    nondefective_dir = "../data/cubic/non_defective/images"
+    image_dir = os.path.join('data', args.image_dir)
+    assert os.path.exists(image_dir)
 
-    output_dir = "../output/eigenfilter_segmentation_svg/"
-
+    output_dir = os.path.join('output', args.output_dir)
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
 
-    # #Plot all raw images
-    # plot_all_raw_images(nondefective_dir, defective_dir, output_dir=output_dir)
+    model_path = os.path.join('models', args.model)
+    assert os.path.exists(model_path)
+    model = load_model(model_path)
 
-    parent_dir_models = "../models/finetuned/"
-    path_bestmodel = "../models/finetuned/20191208-014141/model.h5"
-    assert os.path.exists(path_bestmodel)
-    model = load_model(path_bestmodel)
-
-    run(defective_dir, model, output_dir)
+    run(image_dir, model, output_dir)
     print("Done")
 
 
