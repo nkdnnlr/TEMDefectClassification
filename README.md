@@ -1,6 +1,37 @@
 # TEM-Defect-Classification
+Hi! You've reached the code repository corresponding to the paper "Learning-based Defect Recognition for Quasi-Periodic Microscope Images". This document will guide you through the setup and different steps of the code. You can either test the algorithm directly with one of your images, or train the model again with your own training data.
+
+
+### Testing Pipeline
+0. Download repository and update your python environment.
+   * If you are familiar with git, clone the repository with the following command:
+     ```
+     git clone ...
+     ```
+   Alternatively, on the top right page of this page, download the zipped version of the repository and unpack at your desired place.
+   * Install the latest version of anaconda, then run the following command to set up the python environment:
+     ```
+     conda env create -f environment.yml
+     conda activate environment
+     ```
+  blabla
+1. Update model and data directory. 
+   * [Ask us](nik.dennler@uzh.ch) for the pre-trained model and add it to the `model` directory. Add your images in `tif` format to the `data` directory. 
+2. Run the Eigenfilter segmentation algorithm
+   * Run the following command:
+     ```
+     python src/eigenfilter_segmentation.py
+     ```
+ 
+
+
+### Training Pipeline
+
+
+
 
 ## Motivation
+
 
 ## Training Pipeline
 
