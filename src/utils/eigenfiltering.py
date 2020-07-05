@@ -184,7 +184,7 @@ def mahalanobis_matrix(sample, reference):
     return mh
 
 
-def eigenfiltering(image_def, patch_good, filter_fixed=True, filter_size=7, blurring=16):
+def eigenfiltering(image_def, patch_good, filter_fixed=True, filter_size=7, blurring=16, output_path=None):
     """
     Applies the eigenfiltering algorithm to an image, given a good patch
     :param image_def: Image to be filtered
@@ -222,13 +222,28 @@ def eigenfiltering(image_def, patch_good, filter_fixed=True, filter_size=7, blur
         # Get filter custom sized
         samples = get_filter_sparse(patch_good, period_y=period_y, period_x=period_x)
         samples = np.array(samples)
-        print(samples.shape)
+        # print(samples.shape)
 
         # Get Eigenvectors
         v_sorted, w_sorted = get_eigenvectors(samples)
 
         # Get Sparse filters
         filters = build_sparse_filter(v_sorted, period_y, period_x)
+
+    # Save filters
+    if not os.path.exists(output_path):
+        os.makedirs(output_path)
+
+    if output_path is not None:
+        for idx, filter in enumerate(filters):
+            plt.imshow(filter, cmap='gray')
+            plt.xticks([])
+            plt.yticks([])
+            plt.savefig(os.path.join(output_path, str(idx) + '.svg'), bbox_inches='tight')#,transparent=True,
+            # pad_inches=0)
+            plt.close()
+            # plt.show()
+        # exit()
 
     # Convolute Filter with good images
     good_filtered_all = []

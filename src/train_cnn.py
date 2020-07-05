@@ -11,13 +11,12 @@ import argparse
 import mlflow
 from keras.applications.resnet50 import ResNet50, preprocess_input
 from keras.applications.vgg16 import VGG16
-from src.experimental_stuff import LossHistory
 from keras.preprocessing.image import ImageDataGenerator
 from keras.layers import Dense, Flatten, Dropout
 from keras.models import Model
 from keras.optimizers import Adam
 
-from src.utils.helpers import count_files
+from src.utils.helpers import count_files, LossHistory
 
 parser = argparse.ArgumentParser()
 # Data structure arguments

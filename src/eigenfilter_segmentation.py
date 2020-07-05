@@ -4,6 +4,7 @@ import numpy as np
 np.set_printoptions(threshold=sys.maxsize)
 import tqdm
 import warnings
+import time
 warnings.filterwarnings("ignore", category=UserWarning)
 os.environ['KMP_WARNINGS'] = '0'
 
@@ -49,17 +50,20 @@ def run(parent_dir, model, output_dir):
             # plt.close(fig)
 
             # CROP IN PATCHES
+            startingtime = time.time()
             STEP_SIZE = TARGET_SIZE
             patches = helpers.get_patches(image, target_size=TARGET_SIZE, step=STEP_SIZE)
 
             # PREDICT DEFECT ON PATCHES WITH CNN, THEN ACCUMULATE TO IMAGE
             print("\nPredicting {} patches...".format(len(patches)))
             classes = predict(patches, model)[:, 0].round().astype(int) # One-hot encoded
+            print("PREDICTIONTIME: ", time.time()-startingtime)
+            # continue
             n_patches = classes.shape[0]
             n_side = int(np.sqrt(n_patches))
             class_matrix = classes.T.reshape((n_side, n_side))
             score_map = helpers.map_scores(image, scores=classes, target_size=TARGET_SIZE, step_size=STEP_SIZE)
-            plt.imsave(os.path.join(output_dir, name + "_predicted.png"), score_map, cmap='viridis')
+            # plt.imsave(os.path.join(output_dir, name + "_predicted.png"), score_map, cmap='viridis')
             sum_all += n_patches
             sum_defective += len(classes[classes == 1.])
 
@@ -88,24 +92,32 @@ def run(parent_dir, model, output_dir):
 
             # FILTER FOR LOCAL VARIANCE
             localvariance = helpers.localvariance_filter(image=image)
-
+            print("hi?")
             # SEGMENTING: GET BEST PATCH AND USE IT AS AN EIGENFILTER ON THE IMAGE
-            filtered = eigenfiltering(image_def=image, patch_good=best_patch)
+            startingtime = time.time()
+            filtered = eigenfiltering(image_def=image, patch_good=best_patch, output_path=os.path.join(output_dir,
+                                                                                                       'eigenfilters', name))
+            print("FILTERINGTIME: ", time.time() - startingtime)
+            continue
+            print("hi!")
             maxfiltered = np.max(filtered)
 
             # SAVE PLOTS
-            plt.imsave(os.path.join(output_dir, name + "_01_original.png"), original, cmap='gray')
-            plt.imsave(os.path.join(output_dir, name + "_02_preprocessed.png"), image, cmap='gray')
-            plt.imsave(os.path.join(output_dir, name + "_03_predicted.png"), score_map, cmap='viridis')
+            plt.imsave(os.path.join(output_dir, name + "_01_original.svg"), original, cmap='gray')
+            plt.imsave(os.path.join(output_dir, name + "_02_preprocessed.svg"), image, cmap='gray')
+            plt.imsave(os.path.join(output_dir, name + "_03_predicted.svg"), score_map, cmap='viridis')
             graph_fig, graph_ax = helpers.draw_graphs([G_0, G_1], nx_pos=nx_pos)
-            graph_fig.savefig(os.path.join(output_dir, name + "_04_graph.png"))
+            graph_fig.savefig(os.path.join(output_dir, name + "_04_graph.svg"))
             plt.close(graph_fig)
             graph_fig_best, graph_ax_best = helpers.draw_graphs([G_0, G_1], nx_pos=nx_pos, extra_nodes=[best_node])
-            graph_fig_best.savefig(os.path.join(output_dir, name + "_05_graph_best.png"))
+            # graph_fig_best.savefig(os.path.join(output_dir, name + "_05_graph_best.png"))
+            graph_fig_best.savefig(os.path.join(output_dir, name + "_05_graph_best.svg"))
             plt.close(graph_fig_best)
-            plt.imsave(os.path.join(output_dir, name + "_06_best_patch.png"), best_patch, cmap='gray')
-            plt.imsave(os.path.join(output_dir, name + "_07_segmented.png"), filtered, cmap='viridis', vmin=7, vmax=np.max((22, maxfiltered)))
-            plt.imsave(os.path.join(output_dir, name + "_08_variance.png"), localvariance, cmap='inferno_r', vmin=minlocalvariance-300, vmax=minlocalvariance)
+            plt.imsave(os.path.join(output_dir, name + "_06_best_patch.svg"), best_patch, cmap='gray')
+            plt.imsave(os.path.join(output_dir, name + "_07_segmented.svg"), filtered, cmap='viridis', vmin=7,
+                       vmax=np.max((22, maxfiltered)))
+            plt.imsave(os.path.join(output_dir, name + "_08_variance.svg"), localvariance, cmap='inferno_r',
+                       vmin=minlocalvariance-300, vmax=minlocalvariance)
 
             helpers.make_publication_subplots(original, score_map, filtered, localvariance, 128,
                                       best_node, maxfiltered, minlocalvariance,
@@ -123,7 +135,7 @@ if __name__ == '__main__':
     defective_dir = "../data/cubic/defective/images/"
     nondefective_dir = "../data/cubic/non_defective/images"
 
-    output_dir = "../output/eigenfilter_segmentation/"
+    output_dir = "../output/eigenfilter_segmentation_svg/"
 
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
@@ -131,8 +143,8 @@ if __name__ == '__main__':
     # #Plot all raw images
     # plot_all_raw_images(nondefective_dir, defective_dir, output_dir=output_dir)
 
-    parent_dir_models = "/home/nik/Documents/Defect Classification/TEMDefectAnalysis/models/finetuned/"
-    path_bestmodel = "/home/nik/Documents/Defect Classification/TEMDefectAnalysis/models/finetuned/20191208-014141/model.h5"
+    parent_dir_models = "../models/finetuned/"
+    path_bestmodel = "../models/finetuned/20191208-014141/model.h5"
     assert os.path.exists(path_bestmodel)
     model = load_model(path_bestmodel)
 

@@ -6,6 +6,8 @@ from PIL import Image
 import matplotlib.pyplot as plt
 import numpy as np
 import cv2
+from keras.callbacks import Callback, BaseLogger
+import mlflow
 
 
 def check_gpu():
@@ -252,12 +254,13 @@ def draw_graphs(graphs, nx_pos, extra_nodes=None):
     """
     import networkx as nx
 
-    colors = ['#b361b4', '#f4c06f']
+    # colors = ['#b361b4', '#f4c06f']
+    colors = ['#440154', '#fde724']
     # Draw graphs
     fig, ax = plt.subplots(figsize=(8, 8))
     i = 0
     for graph in graphs:
-        nx.draw(graph, pos=nx_pos, node_color=colors[i], with_labels=True, ax=ax)
+        nx.draw(graph, pos=nx_pos, node_color=colors[i], with_labels=False, ax=ax)
         i += 1
         # nx.draw(G_0, node_color='b', pos=nx_pos, with_labels=True)
         if extra_nodes is not None:
@@ -497,3 +500,15 @@ def get_best_node_from_Kneighbors(G, k=10, connectivity=4):
             weighted_neighbors[node] += occurence/(math.factorial(i)*connectivity**i)
     best = max(weighted_neighbors, key=weighted_neighbors.get)
     return best
+
+
+class LossHistory(Callback):
+    """
+    Keras Callback that allows logging on MLFlow after each epoch end
+    """
+
+    def on_epoch_end(self, epoch, logs=None):
+        metrics = logs.keys()
+        for metric in metrics:
+            # print("metric: ", metric)
+            mlflow.log_metric(metric, logs.get(metric), step=epoch)
