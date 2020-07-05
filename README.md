@@ -6,9 +6,9 @@ This document will guide you through the setup and different steps of the code. 
 ### Testing Pipeline
 The following procedure works best if you have TEM images of cubic crystals, taken at image resolution of a few nanometers per side, or if you have your own trained classification model. If this is not the case, go directly to the training pipeline. 
 1. Download repository and update your python environment.
-   * If you are familiar with git, clone the repository with the following command:
+   * If you have git installed on your machine, clone the repository with the following command:
      ```
-     git clone ...
+     git clone git@github.com:nkdnnlr/TEMDefectClassification.git
      ```
      Alternatively, on the top right page of this page, download the zipped version of the repository and unpack at your desired place.
    * Install the latest version of anaconda, then run the following command to set up the python environment:
