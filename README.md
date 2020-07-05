@@ -1,6 +1,7 @@
 # TEM-Defect-Classification
-Hi! You've reached the code repository corresponding to the paper "Learning-based Defect Recognition for Quasi-Periodic Microscope Images". This document will guide you through the setup and different steps of the code. You can either test the algorithm directly with one of your images, or train the model again with your own training data.
+Hi! You've reached the code repository corresponding to the paper "Learning-based Defect Recognition for Quasi-Periodic Microscope Images", authored by Nik Dennler, Antonio Foncubierta-Rodriguez, Titus Neupert and Marilyne Sousa. 
 
+This document will guide you through the setup and different steps of the code. You can either test the algorithm directly with one of your images, or train the model again with your own training data. If there are error occuring or you find a bug in the code, feel free to [write us](mailto:nik.dennler@uzh.ch) or, even better, open an issue. 
 
 ### Testing Pipeline
 The following procedure works best if you have TEM images of cubic crystals, taken at image resolution of a few nanometers per side, or if you have your own trained classification model. If this is not the case, go directly to the training pipeline. 
@@ -49,27 +50,30 @@ If you have different images than described above, it's best to train the classi
 
 3. Run setup script
  * Decide if you want to UNZIP, produce LABELS and/or do PREPROCESSING (each either `True` or `False`). Run the setup file with the following command:
-  ```
-  python setup.py --unzip True --labels True --preprocessing False 
-  ```
+    ```
+    python setup.py --unzip True --labels True --preprocessing False 
+    ```
   * The preprocessing can take very long (depending on your parameters several hours). It can make sense to first only do UNZIP and LABELS, then check the results of the labels. If you're not satisfied, delete the directory, do the annotations again, and run again the setup file. If you're satisfied, run again with only PREPROCESSING activated.
 
 4. Train model
- * The following is best done on a GPU device. Basically one has to run the `train_cnn.py` file with the desired arguments. For example, the models for six different splits have been trained with the following command: 
+ * The following is best done on a GPU device. Run the following command:
+    ```
+   export PYTHONPATH=`pwd`
+   python src/train_cnn.py
+   ```
+   If no arguments are specifiet, the set of parameters are choosen as specified in the paper. Ther other option is to specify each of the following arguments:
  
- ```
- python3 train_cnn.py -train_dir "../data/cubic/cnn_kfold_128_more/fold$i/train/" -val_dir "../data/cubic/cnn_kfold_128_more/fold$i/test/" -output_dir "../output/vgg16_128_more_finetune/" -name cnn_transfer_imagenet_fold$i -base VGG16 -weights 'imagenet' -train_all True -e 100 -fc 1024 1024 512 -d 0.5 -b 8 -l 0.00001
- ```
- Next to the obvious file paths for training data, validation data and output directory, we specify different parameters:
- * -name: name of the experiment
- * -base: base network. use one available from keras.applications
- * -weights: use weights either trained on ImageNet ('imagenet') or randomly initialized ('None')
- * -fc: fine-tuning layers, fully connected. each entry is the number of neurons per layer
- * -d: dropout fraction
- * -l: learning rate
- * -e: epochs
- * -b: batch size
+   * -train_dir: Training images directory
+   * -val_dir: Validation images directory
+   * -output_dir: Output directory
+   * -name: name of the experiment
+   * -base: base network. use one available from keras.applications, such as VGG16
+   * -weights: use weights either trained on ImageNet ('imagenet') or randomly initialized ('None')
+   * -fc: fine-tuning layers, fully connected. each entry is the number of neurons per layer
+   * -d: dropout fraction
+   * -l: learning rate
+   * -e: epochs
+   * -b: batch size
  
 5. Run segmentation
-
  * See in the above section on how to run the testing pipeline.
