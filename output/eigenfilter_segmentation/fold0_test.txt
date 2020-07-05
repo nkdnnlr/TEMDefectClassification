@@ -1,3 +1,0 @@
-0: JEOL BF 12_SIH05 no annotation.tif
-9: JEOL BF 05 SIH09 no annotation.tif
-11: JEOL BF 19_SIH05 no annotation.tif
