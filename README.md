@@ -1,5 +1,5 @@
 # TEM-Defect-Classification
-Hi! You've reached the code repository corresponding to the paper "Learning-based Defect Recognition for Quasi-Periodic Microscope Images", authored by Nik Dennler, Antonio Foncubierta-Rodriguez, Titus Neupert and Marilyne Sousa. 
+Hi! You've reached the code repository corresponding to the paper ["Learning-based Defect Recognition for Quasi-Periodic Microscope Images"](https://arxiv.org/abs/2007.01309), authored by Nik Dennler, Antonio Foncubierta-Rodriguez, Titus Neupert and Marilyne Sousa. 
 
 This document will guide you through the setup and different steps of the code. You can either test the algorithm directly with one of your images, or train the model again with your own training data. If there are error occuring or you find a bug in the code, feel free to [write us](mailto:nik.dennler@uzh.ch) or, even better, open an issue. 
 
