@@ -32,7 +32,7 @@ If you have different images than described above, it's best to train the classi
 1. Download repository and update your python environment.
    * If you are familiar with git, clone the repository with the following command:
      ```
-     git clone ...
+     git clone git@github.com:nkdnnlr/TEMDefectClassification.git
      ```
      Alternatively, on the top right page of this page, download the zipped version of the repository and unpack at your desired place.
    * Install the latest version of anaconda, then run the following command to set up the python environment:
