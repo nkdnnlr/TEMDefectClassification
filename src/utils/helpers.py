@@ -6,8 +6,8 @@ from PIL import Image
 import matplotlib.pyplot as plt
 import numpy as np
 import cv2
-from keras.callbacks import Callback, BaseLogger
-import mlflow
+# from keras.callbacks import Callback, BaseLogger
+# import mlflow
 
 
 def check_gpu():
@@ -474,7 +474,8 @@ def make_publication_subplots(image, predict, segment, localvariance, patchsize,
 
     if output_path is not None:
         plt.savefig(output_path, bbox_inches="tight")
-    plt.show()
+        plt.close()
+    # plt.show()
 
 
 def get_best_node_from_Kneighbors(G, k=10, connectivity=4):
@@ -502,13 +503,13 @@ def get_best_node_from_Kneighbors(G, k=10, connectivity=4):
     return best
 
 
-class LossHistory(Callback):
-    """
-    Keras Callback that allows logging on MLFlow after each epoch end
-    """
+# class LossHistory(Callback):
+#     """
+#     Keras Callback that allows logging on MLFlow after each epoch end
+#     """
 
-    def on_epoch_end(self, epoch, logs=None):
-        metrics = logs.keys()
-        for metric in metrics:
-            # print("metric: ", metric)
-            mlflow.log_metric(metric, logs.get(metric), step=epoch)
+#     def on_epoch_end(self, epoch, logs=None):
+#         metrics = logs.keys()
+#         for metric in metrics:
+#             # print("metric: ", metric)
+#             mlflow.log_metric(metric, logs.get(metric), step=epoch)

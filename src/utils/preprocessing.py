@@ -8,8 +8,8 @@ import cv2
 from skimage import exposure, filters
 import matplotlib.pyplot as plt
 
-from src.utils.helpers import get_image
-
+# from src.utils.helpers import get_image
+from utils.helpers import get_image
 
 def mean_filtering(image, kernel_size=5):
     """
@@ -31,7 +31,7 @@ def median_filtering(image, kernel_size=5):
     return cv2.medianBlur(image, ksize=kernel_size)
 
 
-def gaussian_filtering(image, kernel_size=5, stdev=0):
+def gaussian_filtering(image, kernel_size=5, stdev=1):
     """
     Convolves Gaussian filter of a given kernel size and standard deviation with image
     :param image: np.array of OpenCV format (in [0, 255])
@@ -64,6 +64,28 @@ def rescale_intensity(image, p_range=(2, 98)):
     p2, p98 = percentile(image, p_range)
     return exposure.rescale_intensity(image, in_range=(p2, p98))
 
+def cut_intensity(image, min, max):
+    """
+
+    Args:
+        image (np.array): 
+        min ([type]): [description]
+        max ([type]): [description]
+    """
+    image_cut = image.copy()
+    image_cut[image_cut < min] = min
+    image_cut[image_cut > max] = max
+    return image_cut    
+    
+    
+def normalize_intensity(image):
+    """Normalize the intensity to range [0, 1]
+    Args:
+        image ([type]): Numpy array of image
+    """
+    image = (image - np.min(image))
+    image = image / np.max(image)
+    return image
 
 def preprocess_image(image,
                      lowpass_filter="gaussian", lowpass_kernel_size=5,
@@ -224,8 +246,18 @@ if __name__ == '__main__':
 
     # file1 = "/home/nik/Documents/Defect Classification/TEMDefectAnalysis/data/cubic/cnn/train/defective/7.tif"
     # preprocess_showingoff(file1)
-    output_dir = "/home/nik/Documents/Defect Classification/TEMDefectAnalysis/output/preprocessing"
-    file = "/home/nik/Documents/Defect Classification/TEMDefectAnalysis/data/cubic/defective/images/JEOL BF 50_SIH05 no annotation.tif"
+    # output_dir = "/home/nik/Documents/Defect Classification/TEMDefectAnalysis/output/preprocessing"
+    # file = "/home/nik/Documents/Defect Classification/TEMDefectAnalysis/data/cubic/defective/images/JEOL BF 50_SIH05 no annotation.tif"
     # file2 = "/home/nik/Documents/Defect Classification/TEMDefectAnalysis/data/cubic/defective/folds/fold0/train/original/images/0/JEOL BF 05 SIH09 no annotation.tif"
-    preprocess_showingoff(file, output_dir=output_dir, name="JEOL BF 50_SIH05")
+    # preprocess_showingoff(file, output_dir=output_dir, name="JEOL BF 50_SIH05")
 
+
+    image = np.array([2,7,16,4,24])
+    print(image)
+    
+    image = cut_intensity(image, 6, 20)
+    print(image)
+    image = normalize_intensity(image)
+    print(image)
+    
+    exit()

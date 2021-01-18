@@ -6,7 +6,10 @@ import scipy as sp
 import matplotlib.pyplot as plt
 import tqdm
 
-import src.utils.helpers as helpers
+# import src.utils.helpers as helpers
+import utils.helpers as helpers
+# import helpers as helpers
+
 
 
 def get_fft_period(x):
@@ -141,7 +144,10 @@ def convolute_filter(patch, filter):
     :param filter: Filter
     :return:
     """
-    sample = sp.ndimage.filters.convolve(patch, filter, mode="wrap")  # , cval=1.0)
+    sample = sp.ndimage.filters.convolve(patch, filter, mode="mirror")  # , cval=1.0)
+    # sample = sp.ndimage.filters.convolve(patch, filter, mode="wrap")  # , cval=1.0)
+    # sample = sp.ndimage.filters.convolve(patch, filter, mode="constant", cval=2550.)
+
     return sample
 
 
@@ -153,9 +159,8 @@ def get_energy(image, blur=25):
     :param blur: Size of blurring filter
     :return:
     """
-    energy = sp.ndimage.filters.convolve(
-        np.square(image), np.ones([blur, blur]), mode="constant"
-    )  # , cval=1.0)
+    energy = sp.ndimage.filters.convolve(np.square(image), np.ones([blur, blur]), mode="constant")  # , cval=1.0)
+    # energy = np.square(image)
     return energy
 
 
@@ -183,6 +188,41 @@ def mahalanobis_matrix(sample, reference):
     mh = np.reshape(mh, (m, n))
     return mh
 
+def handle_edges(image, edgesize, patchsize):
+    e = edgesize
+    p = patchsize
+
+    lenx, leny = image.shape
+
+    for x in range(lenx):
+        for y in range(leny):
+            for n in range(24):
+                if (x >= e+(1/2+1/4+n/2)*p) and (x < e+(1/2+2/4+n/2)*p):
+                    image[x,y] *= 2
+            # for n in range(12):
+                if (y >= e+(1/2+1/4+n/2)*p) and (y < e+(1/2+2/4+n/2)*p):
+                    image[x,y] *= 2
+                    
+            if (x < e+(1/2)*p) or (y < e+(1/2)*p) or (x > lenx-e-(1/4)*p) or (y > leny-e-(1/4)*p):
+                image[x,y] *= 2
+                
+            
+            if (x < e+(1/2)*p) and (y < e+(1/2)*p):
+                image[x,y] *= 2
+                
+            if (x < e+(1/2)*p) and (y > leny-e-(1/4)*p):
+                image[x,y] *= 2
+                
+            if (x > lenx-e-(1/4)*p) and (y < e+(1/2)*p):
+                image[x,y] *= 2
+            
+            if (x > lenx-e-(1/4)*p) and (y > leny-e-(1/4)*p):
+                image[x,y] *= 2    
+                
+            
+            
+    return image
+    
 
 def eigenfiltering(image_def, patch_good, filter_fixed=True, filter_size=7, blurring=16, output_path=None):
     """
@@ -190,13 +230,14 @@ def eigenfiltering(image_def, patch_good, filter_fixed=True, filter_size=7, blur
     :param image_def: Image to be filtered
     :param patch_good: Good patch to design the filter from
     :param filter_fixed: Boolean. If False, choosing sparse filter based on periodicity (calculating periodicity does not work well)
-    :param filter_size: Filter size (square)
-    :param blurring: Blur factor used in calculating the energies
+    :param filter_size: Filter size (square) TODO: check again optimum
+    :param blurring: Blur factor used in calculating the energies TODO: check again optimum
     :return:
     """
+    # blurring = 2
     target_size = patch_good.shape[0]
-    edge = blurring // 2 + 7
-    step = target_size - 2 * edge
+    edge = 16 // 2 + 8
+    step = target_size // 2 #- 2 * edge
 
     starttime = time.time()
 
@@ -256,7 +297,24 @@ def eigenfiltering(image_def, patch_good, filter_fixed=True, filter_size=7, blur
         good_energies.append(energy)
         i += 1
     good_energies = np.array(good_energies)
-
+    
+    # fig, ax = plt.subplots(ncols=4)
+    
+    # print(patch_good)
+    # print("Ho")
+    # print(filter)
+    # print("Ho")
+    # # print(good_filtered)
+    # # orint("Ho")
+    # exit()    
+    # ax[0].imshow(patch_good)
+    # ax[1].imshow(filter)
+    # im2 = ax[2].imshow(good_filtered)
+    # cbar0 = fig.colorbar(im2, ax=ax[2])
+    # ax[3].imshow(energy)
+    # plt.show()
+    # exit()
+    
     patches_def = helpers.get_patches(image_def, target_size=target_size, step=step)
     n_patches = len(patches_def)
 
@@ -277,20 +335,34 @@ def eigenfiltering(image_def, patch_good, filter_fixed=True, filter_size=7, blur
             energy = get_energy(defective_filtered, blur=blurring)
             defective_energies.append(energy)
             i += 1
+
+
+        # fig, ax = plt.subplots(ncols=4)
+        # ax[0].imshow(PATCH_DEF)
+        # ax[1].imshow(filter)
+        # ax[2].imshow(defective_filtered)
+        # ax[3].imshow(energy)
+        # plt.show()
+        
         defective_energies = np.array(defective_energies)
 
         # Calculate Mahalanobis distance between good and defective energies.
         mh = mahalanobis_matrix(defective_energies, good_energies)
 
-        # Set edges to zero
-        mh[:edge, :] = 0
-        mh[-edge:, :] = 0
-        mh[:, :edge] = 0
-        mh[:, -edge:] = 0
-
+        # Set edges to zero TODO: why necessary? 
+        nrows = int(np.sqrt(n_patches))
+        mh[:edge, :] = 0.#np.mean(mh)
+        mh[:, :edge] = 0.#np.mean(mh)
+        mh[:, -edge:] = 0.#np.mean(mh)            
+        mh[-edge:, :] = 0.#np.mean(mh)
+        # if (not k%nrows==0):
+        #     mh[:, -edge:] = 0            
+        # if (not k//nrows==nrows):
+        #     mh[-edge:, :] = 0
         mhs.append(mh)
 
     result = helpers.get_image_from_patches(image=image, patches=mhs, target_size=target_size, step=step)
+    result = handle_edges(result, edgesize=edge, patchsize=target_size)
     print("Analysis done in {} seconds.".format(time.time() - starttime))
     return result
 
