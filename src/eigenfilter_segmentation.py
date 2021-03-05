@@ -18,6 +18,7 @@ import utils.helpers as helpers
 from utils.predict_class import predict
 from utils.eigenfiltering import eigenfiltering
 from utils.preprocessing import preprocess_image, normalize_intensity, cut_intensity
+from bragg_filtering_fromscratch import bragg_filtering
 
 # import src.utils.helpers as helpers
 # from src.utils.predict_class import predict
@@ -59,6 +60,10 @@ def run(parent_dir, model, output_dir_, TARGET_SIZE = 128):
                     print("\nFile: " + file)
                     original = helpers.get_image(file)
 
+
+                    bragg_filtering(original)
+
+                    exit()
 
                     image = skimage.filters.gaussian(original, 2) - skimage.filters.gaussian(original, 3) #Looks quite much like previous setting
                     image = np.interp(image, (image.min(), image.max()), (0, 254))
@@ -113,6 +118,9 @@ def run(parent_dir, model, output_dir_, TARGET_SIZE = 128):
 
                     # GET BEST PATCH
                     best_patch = patches[best_node]
+                    np.save(os.path.join(output_dir, name + "bestpatch.npy"), best_patch)
+                    # continue
+
 
                     # # GET ANNOTADED IMAGE (WITH BEST PATCH)
                     # image_annotated = add_bestpatch_to_img(image, patchsize=128, patch=best_node, color='gray')
@@ -124,20 +132,51 @@ def run(parent_dir, model, output_dir_, TARGET_SIZE = 128):
 
                     # FILTER FOR LOCAL VARIANCE
                     localvariance = helpers.localvariance_filter(image=image)
+
+                    # SAVE EVERYTHING BEFORE SYMMETRY FILTERING
+                    plt.imsave(os.path.join(output_dir, name + "_01_original.svg"), original, cmap='gray')
+                    plt.imsave(os.path.join(output_dir, name + "_02_preprocessed.svg"), image, cmap='gray')
+                    plt.imsave(os.path.join(output_dir, name + "_03_predicted.svg"), score_map, cmap='viridis')
+                    graph_fig, graph_ax = helpers.draw_graphs([G_0, G_1], nx_pos=nx_pos)
+                    graph_fig.savefig(os.path.join(output_dir, name + "_04_graph.svg"))
+                    plt.close(graph_fig)
+                    graph_fig_best, graph_ax_best = helpers.draw_graphs([G_0, G_1], nx_pos=nx_pos, extra_nodes=[best_node])
+                    # graph_fig_best.savefig(os.path.join(output_dir, name + "_05_graph_best.png"))
+                    graph_fig_best.savefig(os.path.join(output_dir, name + "_05_graph_best.svg"))
+                    plt.close(graph_fig_best)
+
+                    np.save(os.path.join(output_dir, name + "_08_localvariance.npy"), localvariance)
+                    plt.imsave(os.path.join(output_dir, name + "_08_localvariance.svg"), localvariance, cmap='inferno_r',
+                               vmin=minlocalvariance - 300, vmax=minlocalvariance)
+
+                    # continue
+
                     # SEGMENTING: GET BEST PATCH AND USE IT AS AN EIGENFILTER ON THE IMAGE
                     startingtime = time.time()
                     filtered = eigenfiltering(image_def=image, patch_good=best_patch, output_path=os.path.join(output_dir,
                                                                                                             'eigenfilters', name), blurring=blurring, filter_size=filtersize)
                     maxfiltered = np.max(filtered)
-                    
-                    plt.imshow(filtered, vmin=26)
+                    minval = np.min(filtered[filtered > 0])
+
+
+                    plt.imshow(filtered, vmin=minval)
                     plt.show()
+                    plt.close()
+
+
+
+
+                    np.save(os.path.join(output_dir, name + "symmetry.npy"), filtered)
+                    plt.imsave(os.path.join(output_dir, name + "symmetry.svg"), filtered, cmap='viridis', vmin=minval)
+                               # vmax=np.max((22, maxfiltered)))
+
+
+                    continue
                     
                     # print(filtered)
-                    exit()
+                    # exit()
                     
                     # exit()
-                    np.save(os.path.join(output_dir, name + "07_segmented.npy"), filtered)
                     # plt.close('all')
                     # continue
 
@@ -150,16 +189,7 @@ def run(parent_dir, model, output_dir_, TARGET_SIZE = 128):
                     # print(filtered)
 
                     # SAVE PLOTS
-                    plt.imsave(os.path.join(output_dir, name + "_01_original.svg"), original, cmap='gray')
-                    plt.imsave(os.path.join(output_dir, name + "_02_preprocessed.svg"), image, cmap='gray')
-                    plt.imsave(os.path.join(output_dir, name + "_03_predicted.svg"), score_map, cmap='viridis')
-                    graph_fig, graph_ax = helpers.draw_graphs([G_0, G_1], nx_pos=nx_pos)
-                    graph_fig.savefig(os.path.join(output_dir, name + "_04_graph.svg"))
-                    plt.close(graph_fig)
-                    graph_fig_best, graph_ax_best = helpers.draw_graphs([G_0, G_1], nx_pos=nx_pos, extra_nodes=[best_node])
-                    # graph_fig_best.savefig(os.path.join(output_dir, name + "_05_graph_best.png"))
-                    graph_fig_best.savefig(os.path.join(output_dir, name + "_05_graph_best.svg"))
-                    plt.close(graph_fig_best)
+
                     plt.imsave(os.path.join(output_dir, name + "_06_best_patch.svg"), best_patch, cmap='gray')
                     plt.imsave(os.path.join(output_dir, name + "_07_segmented.svg"), filtered, cmap='viridis', vmin=7,
                             vmax=np.max((22, maxfiltered)))
@@ -180,13 +210,17 @@ def run(parent_dir, model, output_dir_, TARGET_SIZE = 128):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    # parser.add_argument("-image_dir", "--image_dir", type=str, default="cubic/defective/images",
-    #                     help="Name of image directory")
-    parser.add_argument("-image_dir", "--image_dir", type=str, default="test",
+    parser.add_argument("-image_dir", "--image_dir", type=str, default="cubic/defective/images",
                         help="Name of image directory")
+    # parser.add_argument("-image_dir", "--image_dir", type=str, default="12",
+    #                     help="Name of image directory")
+    # parser.add_argument("-image_dir", "--image_dir", type=str, default="test2",
+    #                     help="Name of image directory")
     parser.add_argument("-model", "--model", type=str, default="20191208-014141.h5",
                         help="Name of model file.")
-    parser.add_argument("-output_dir", "--output_dir", type=str, default="eigenfilter_segmentation",
+    # parser.add_argument("-output_dir", "--output_dir", type=str, default="eigenfilter_segmentation_forpost",
+    #                     help="Name of model file.")
+    parser.add_argument("-output_dir", "--output_dir", type=str, default="braggfiltering",
                         help="Name of model file.")
     args = parser.parse_args()
 

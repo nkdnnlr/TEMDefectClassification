@@ -7,79 +7,64 @@ import matplotlib.pyplot as plt
 from skimage.filters import frangi, hessian
 
 from utils.preprocessing import preprocess_image, normalize_intensity, cut_intensity, gaussian_filtering
+from utils import helpers
 
-output_dir = '/home/nik/UZH/IBM/TEMDefectClassification/output/eigenfilter_segmentation/b12_fs11'
+# output_dir = '/home/nik/UZH/IBM/TEMDefectClassification/output/eigenfilter_segmentation/b12_fs11'
+# output_dir = '/home/nik/UZH/IBM/TEMDefectClassification/output/eigenfilter_segmentation_forpost/b16_fs7'
+output_dir = '/home/nik/UZH/IBM/TEMDefectClassification/output/eigenfilter_segmentation_12/b16_fs7'
 
 
 # image_names = ['JEOL BF 05 SIH09 no annotation07_segmented.npy', 'JEOL BF 06_lou no annotation07_segmented.npy']
 
-m = 100
-
 
 for name in os.listdir(output_dir):
-    if not name.endswith('.npy'):
+    if not name.endswith('symmetry.npy'):
         continue
-    filepath = os.path.join(output_dir, name)
-    image = np.load(filepath)    
-    image_cut = cut_intensity(image, min=0, max=22)
+    print(name)
+    filepath_sym = os.path.join(output_dir, name)
+    filepath_var = filepath_sym[:-12]+"_08_localvariance.npy"
+    filepath_bestpatch = filepath_sym[:-12]+"bestpatch.npy"
+
+    image_var = np.load(filepath_var)
+    image_sym = np.load(filepath_sym)
+    best_patch = np.load(filepath_bestpatch)
+
+    # Local Variance Filtering
+    localvariance_patch = helpers.localvariance_filter(image=best_patch)
+    minlocalvariance = np.min(localvariance_patch)
+    image_var_filtered = gaussian_filtering(image_var*255, kernel_size=101, stdev=10)/255.
+    image_var_binarized = image_var_filtered<minlocalvariance/1.2
+
+    # Symmetry Filtering
+    minval = np.min(image_sym[image_sym>0])
+    image_cut = cut_intensity(image_sym, min=minval, max=None)
     image_normalized = normalize_intensity(image_cut)
     image_filtered = gaussian_filtering(image_normalized*255, kernel_size=101, stdev=6)/255.
-    image_smaller = image_filtered[m:-m, m:-m]
-    # th, image_binarized = cv2.threshold(np.image_smaller, 128, 255, cv2.THRESH_OTSU)#frangi(image_smaller)
-    # th, image_binarized = cv2.threshold(np.uint8(255*image_smaller),127,255,cv2.THRESH_OTSU)
+    image_smaller = image_filtered
     th, image_binarized = cv2.threshold(np.uint8(255*image_smaller),127,255,cv2.THRESH_TRIANGLE)
+    image_binarized = cv2.medianBlur(image_binarized, 21)
+    image_binarized = image_binarized / np.max(image_binarized)
+    binarized_both = np.maximum.reduce([image_var_binarized*1.05, image_binarized])
 
-
-      
-    
-    # K-MEANS CLUSTERING
-    # image_smaller_ = image_smaller.reshape(image_smaller.shape[0] * image_smaller.shape[1], 1)
-    # from sklearn.cluster import KMeans, MiniBatchKMeans, Birch
-
-    # n=2
-    # kmeans = MiniBatchKMeans(n_clusters=n).fit(image_smaller_)
-    # clustered = kmeans.cluster_centers_[kmeans.labels_]
-    # labels = kmeans.labels_
-    # # for n in range(n):
-    # n=0
-    # image_cluster = []
-    # for i in range(len(labels)):
-    #     if(labels[i]) == n:
-    #         image_cluster.append(float(clustered[i]))
-    #     else:
-    #         image_cluster.append(1)
-    # if(n==1):
-    #     image_fix= np.array(image_cluster).reshape(image_smaller.shape)
-    # image_binarized = np.array(image_cluster).reshape(image_smaller.shape)
-        # plt.imshow(reshape_clustered, cmap=plt.get_cmap("gray"),vmin=0, vmax=1)
-        # plt.show()
-    
-    
-    # Morphology
-    #    defining the kernel i.e. Structuring element 
-    # kernel = np.ones((12, 12), np.uint8) 
-    # #     # defining the closing function  
-    # image_binarized = cv2.morphologyEx(image_binarized, cv2.MORPH_OPEN, kernel) 
-    # image_binarized = cv2.morphologyEx(image_binarized, cv2.MORPH_CLOSE, 2*kernel) 
-    
-    # image_binarized = cv2.morphologyEx(image_binarized, cv2.MORPH_OPEN, 50*kernel) 
-    # image_binarized = cv2.morphologyEx(image_binarized, cv2.MORPH_CLOSE, 40*kernel) 
-    image_binarized = cv2.medianBlur(image_binarized, 31) 
-    
-    fig, axes = plt.subplots(ncols = 2)
-    axes[0].imshow(image)
-    # axes[1].imshow(image_cut)
-    # axes[1].imshow(image_normalized)
-    # axes[1].imshow(image_smaller)
-    # axes[2].imshow(image_binarized, cmap='gray')
-    axes[1].imshow(image_binarized, cmap='gray')
-    
+    # Plots
+    fig, axes = plt.subplots(ncols=2)
+    axes[0].imshow(image_var)
+    axes[1].imshow(image_sym)
     for ax in axes:
         ax.set_xticks([])
         ax.set_yticks([])
     plt.suptitle(name)
-    
+    plt.show()
+
+    fig, axes = plt.subplots(ncols=1)
+    axes.imshow(binarized_both, cmap='gist_stern_r', vmin=0, vmax=1.05)
+    axes.set_xticks([])
+    axes.set_yticks([])
+    plt.suptitle(name)
     plt.savefig(os.path.join(output_dir, name[:-4]+'_binarized.png'))
     plt.show()
-    plt.close()
+
+    continue
+
+    exit()
     # exit()
