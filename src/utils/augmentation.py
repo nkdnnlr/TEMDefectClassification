@@ -7,6 +7,7 @@ import random
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 
 import numpy as np
+np.set_printoptions(threshold=sys.maxsize)
 import matplotlib.pyplot as plt
 import matplotlib.image as img
 import cv2
@@ -380,8 +381,16 @@ def randomcrop_folds(dir_data, crop_target=None, batch_size=50, intensity_flip=T
                     random.choice(sorted(os.listdir(dir_augmented_images))),
                 )
 
+                # print(images_path)
                 images = img_to_array(load_img(images_path, color_mode="grayscale"))
                 labels = img_to_array(load_img(labels_path, color_mode="grayscale"))
+
+                # labels = labels.reshape([1024, 1024])
+                # plt.imshow(labels)
+                # plt.show()
+                #
+                # print(np.unique(labels))
+                # exit()
 
                 batch_images_temp = random_crop(
                     images, (crop_target, crop_target), seed=random_state
@@ -395,7 +404,8 @@ def randomcrop_folds(dir_data, crop_target=None, batch_size=50, intensity_flip=T
                 max = np.mean(
                     np.partition(batch_images_temp[:, :, 0].flatten(), -10)[-10:]
                 )
-                if max != 255.0:
+
+                if max != 255.0:  # Making sure to cover no edge!
 
                     if intensity_flip and random.randint(0, 1) == 1:
                         batch_images_temp = flip_intensity(batch_images_temp)
@@ -408,13 +418,13 @@ def randomcrop_folds(dir_data, crop_target=None, batch_size=50, intensity_flip=T
                         os.path.join(
                             dir_augmented_cropped_images, "{}.tif".format(i)
                         ),
-                        batch_images_temp,
+                        batch_images_temp
                     )
                     save_img(
                         os.path.join(
                             dir_augmented_cropped_labels, "{}.tif".format(i)
                         ),
-                        batch_labels_temp,
+                        batch_labels_temp, scale=False
                     )
 
                     i += 1

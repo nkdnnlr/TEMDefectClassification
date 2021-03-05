@@ -9,7 +9,7 @@ from skimage import exposure, filters
 import matplotlib.pyplot as plt
 
 # from src.utils.helpers import get_image
-from utils.helpers import get_image
+from src.utils.helpers import get_image
 
 def mean_filtering(image, kernel_size=5):
     """
@@ -73,8 +73,10 @@ def cut_intensity(image, min, max):
         max ([type]): [description]
     """
     image_cut = image.copy()
-    image_cut[image_cut < min] = min
-    image_cut[image_cut > max] = max
+    if min is not None:
+        image_cut[image_cut < min] = min
+    if max is not None:
+        image_cut[image_cut > max] = max
     return image_cut    
     
     
@@ -143,7 +145,12 @@ def preprocess_file(file_path, file_path_preprocessed,
     :return:
     """
     image = get_image(file_path)
-    image_preprocessed = preprocess_image(image=image, lowpass_filter=lowpass_filter, lowpass_kernel_size=lowpass_kernel_size, highpass_filter=highpass_filter, highpass_kernel_size=highpass_kernel_size, rescale=rescale)
+    # image_preprocessed = preprocess_image(image=image, lowpass_filter=lowpass_filter, lowpass_kernel_size=lowpass_kernel_size, highpass_filter=highpass_filter, highpass_kernel_size=highpass_kernel_size, rescale=rescale)
+
+    image_preprocessed = filters.gaussian(image, 2) - filters.gaussian(image, 3)  # Looks quite much like
+    # previous setting
+    image_preprocessed = np.interp(image_preprocessed, (image_preprocessed.min(), image_preprocessed.max()), (0, 254))
+
     image_preprocessed =  image_preprocessed.astype('uint8')
     cv2.imwrite(file_path_preprocessed, image_preprocessed)
 
@@ -188,6 +195,8 @@ def preprocess_folder(directory_original, directory_preprocessed, image_format="
                         highpass_filter=highpass_filter, highpass_kernel_size=highpass_kernel_size,
                         rescale=rescale)
         # TODO: Make sure that arguments are passed on, best in a nice way!!!
+
+
 
 
 def preprocess_showingoff(file_path, output_dir, name,

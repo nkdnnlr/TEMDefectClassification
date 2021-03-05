@@ -6,6 +6,7 @@ import sys
 sys.path.append(os.path.join(os.path.dirname(__file__), "../.."))
 
 import matplotlib.image as img
+import numpy as np
 
 
 def balance(dir1, dir2):
@@ -57,6 +58,24 @@ def sort_folds_by_label(dir_target, n_folds, threshold_defective=0.1, threshold_
         sort_by_label(dir_target + "/fold{}/train".format(str(fold)), threshold_defective=threshold_defective, threshold_nondefective=threshold_nondefective, nolabels=nolabels)
         print("test")
         sort_by_label(dir_target + "/fold{}/test".format(str(fold)), threshold_defective=threshold_defective, threshold_nondefective=threshold_nondefective, nolabels=nolabels)
+
+def sort_folds_by_label_(dir_target, n_folds, threshold_defective=0.1, threshold_nondefective=0.01, nolabels=False):
+    """
+
+    :param n_folds:
+    :param threshold_defective:
+    :param threshold_nondefective:
+    :param nolabels:
+    :return:
+    """
+    for fold in tqdm.trange(n_folds):
+        print("Sort fold{} by label".format(fold))
+        print("train")
+        sort_by_label_(dir_target + "/fold{}/train".format(str(fold)), threshold_defective=threshold_defective,
+        threshold_nondefective=threshold_nondefective, nolabels=nolabels)
+        print("test")
+        sort_by_label_(dir_target + "/fold{}/test".format(str(fold)), threshold_defective=threshold_defective,
+                       threshold_nondefective=threshold_nondefective, nolabels=nolabels)
 
 
 def sort_by_label(dir_data, threshold_defective=0.1, threshold_nondefective=0.01, nolabels=False):
@@ -112,6 +131,92 @@ def sort_by_label(dir_data, threshold_defective=0.1, threshold_nondefective=0.01
             elif ratio <= threshold_nondefective:
                 shutil.copy(file_image, dir_nondefective_images)
                 shutil.copy(file_label, dir_nondefective_labels)
+            else:
+                shutil.copy(file_image, dir_neglecting_images)
+                shutil.copy(file_label, dir_neglecting_labels)
+
+def sort_by_label_(dir_data, threshold_defective=0.1, threshold_nondefective=0.01, nolabels=False):
+    """
+
+    :param dir_data:
+    :param threshold_defective:
+    :param threshold_nondefective:
+    :param nolabels:
+    :return:
+    """
+    dir_images = os.path.join(dir_data, "patches", "images")
+    dir_labels = os.path.join(dir_data, "patches", "labels")
+
+    dir_nondefective_images = os.path.join(dir_data, "classes", "nondefective", "images")
+    dir_nondefective_labels = os.path.join(dir_data, "classes", "nondefective", "labels")
+    dir_defective_images = os.path.join(dir_data, "classes", "defective", "images")
+    dir_defective_labels = os.path.join(dir_data, "classes", "defective", "labels")
+    dir_neglecting_images = os.path.join(dir_data, "classes", "neglecting", "images")
+    dir_neglecting_labels = os.path.join(dir_data, "classes", "neglecting", "labels")
+    if os.path.exists(dir_nondefective_images) and os.path.isdir(
+        dir_nondefective_images
+    ):
+        shutil.rmtree(dir_nondefective_images)
+        shutil.rmtree(dir_nondefective_labels)
+        shutil.rmtree(dir_defective_images)
+        shutil.rmtree(dir_defective_labels)
+    os.makedirs(dir_nondefective_images)
+    os.makedirs(dir_nondefective_labels)
+    os.makedirs(dir_defective_images)
+    os.makedirs(dir_defective_labels)
+    os.makedirs(dir_neglecting_images)
+    os.makedirs(dir_neglecting_labels)
+
+    files = [file for file in os.listdir(dir_labels) if file.endswith(".tif")]
+
+    for file in files:
+        file_label = os.path.join(dir_labels, file)
+        file_image = os.path.join(dir_images, file)
+
+        if nolabels:
+            shutil.copy(file_image, dir_nondefective_images)
+            shutil.copy(file_label, dir_nondefective_labels)
+
+        else:
+            label = img.imread(file_label)
+
+            unique, count = np.unique(label, return_counts = True)
+
+            pixel_dict = {u: c for u, c in zip(unique, count)}
+
+            r_nondef = 0
+            r_def = 0
+            r_blur = 0
+            try:
+                r_nondef = pixel_dict[0]/(128*128)
+            except KeyError:
+                pass
+            try:
+                r_def = pixel_dict[127]/(128*128)
+            except KeyError:
+                pass
+            try:
+                r_blur = pixel_dict[255]/(128*128)
+            except KeyError:
+                pass
+            # print(r_nondef, r_def, r_blur)
+
+            thr_def = 0.1
+            thr_nondef = 0.01
+
+            # Defective
+            if r_blur > thr_def:
+                shutil.copy(file_image, dir_defective_images)
+                shutil.copy(file_label, dir_defective_labels)
+            elif (r_def > thr_def) and (r_def < (1-thr_def)):
+                shutil.copy(file_image, dir_defective_images)
+                shutil.copy(file_label, dir_defective_labels)
+
+            # Non-Defective
+            elif (r_blur < thr_nondef) and ((r_def<thr_nondef) or (r_def>(1-thr_nondef))):
+                shutil.copy(file_image, dir_nondefective_images)
+                shutil.copy(file_label, dir_nondefective_labels)
+            # Neglected
             else:
                 shutil.copy(file_image, dir_neglecting_images)
                 shutil.copy(file_label, dir_neglecting_labels)

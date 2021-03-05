@@ -8,6 +8,50 @@ import matplotlib.pyplot as plt
 import cv2
 import tqdm
 
+def get_labels_from_json(dir_labels, dir_annotated, format="tif", no_label=False):
+    if not os.path.exists(dir_labels):
+        print("New Label Directory:", dir_labels)
+        os.makedirs(dir_labels)
+    else:
+        print("Existing Label Directory:", dir_labels)
+        print("Attention: Overwriting...")
+
+    print("Create labels in directory ", dir_labels)
+
+    filenames = [
+        file for file in os.listdir(dir_annotated) if file.endswith("." + format)
+    ]
+
+    for i in tqdm.trange(len(filenames)):
+        filename = filenames[i]
+    # for filename in filenames:
+        full_path = os.path.join(dir_annotated, filename)
+        full_path_label = os.path.join(dir_labels, filename)
+        image = img.imread(full_path)
+
+        label = extract_label(
+            image, labelcolors=["red", "green", "blue"], fill=True, no_label=no_label
+        )
+
+        Image.fromarray(np.uint8(label * 255.0)).save(full_path_label)
+
+        import matplotlib.gridspec as gridspec
+        plt.figure(figsize=(16, 8))
+        gs1 = gridspec.GridSpec(1, 2)
+        gs1.update(wspace=0.05, hspace=0.05)
+
+        ax0 = plt.subplot(gs1[0])
+        ax0.imshow(image, cmap='gray')
+        ax0.set_xticks([])
+        ax0.set_yticks([])
+
+        ax1 = plt.subplot(gs1[1])
+        ax1.imshow(label, cmap='gray')
+        ax1.set_xticks([])
+        ax1.set_yticks([])
+
+        plt.show()
+
 
 def extract_label(
     image,
