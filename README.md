@@ -1,14 +1,14 @@
 # TEM-Defect-Classification
-Hi! You've reached the code repository corresponding to the paper "Learning-based Defect Recognition for Quasi-Periodic Microscope Images", authored by Nik Dennler, Antonio Foncubierta-Rodriguez, Titus Neupert and Marilyne Sousa. 
+Hi! You've reached the code repository corresponding to the paper ["Learning-based Defect Recognition for Quasi-Periodic Microscope Images"](https://arxiv.org/abs/2007.01309), authored by Nik Dennler, Antonio Foncubierta-Rodriguez, Titus Neupert and Marilyne Sousa. 
 
 This document will guide you through the setup and different steps of the code. You can either test the algorithm directly with one of your images, or train the model again with your own training data. If there are error occuring or you find a bug in the code, feel free to [write us](mailto:nik.dennler@uzh.ch) or, even better, open an issue. 
 
 ### Testing Pipeline
 The following procedure works best if you have TEM images of cubic crystals, taken at image resolution of a few nanometers per side, or if you have your own trained classification model. If this is not the case, go directly to the training pipeline. 
 1. Download repository and update your python environment.
-   * If you are familiar with git, clone the repository with the following command:
+   * If you have git installed on your machine, clone the repository with the following command:
      ```
-     git clone ...
+     git clone git@github.com:nkdnnlr/TEMDefectClassification.git
      ```
      Alternatively, on the top right page of this page, download the zipped version of the repository and unpack at your desired place.
    * Install the latest version of anaconda, then run the following command to set up the python environment:
@@ -32,7 +32,7 @@ If you have different images than described above, it's best to train the classi
 1. Download repository and update your python environment.
    * If you are familiar with git, clone the repository with the following command:
      ```
-     git clone ...
+     git clone git@github.com:nkdnnlr/TEMDefectClassification.git
      ```
      Alternatively, on the top right page of this page, download the zipped version of the repository and unpack at your desired place.
    * Install the latest version of anaconda, then run the following command to set up the python environment:
