@@ -8,7 +8,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 
 import argparse
 
-import mlflow
+# import mlflow
 from keras.applications.resnet50 import ResNet50, preprocess_input
 from keras.applications.vgg16 import VGG16
 from keras.preprocessing.image import ImageDataGenerator
@@ -16,13 +16,13 @@ from keras.layers import Dense, Flatten, Dropout
 from keras.models import Model
 from keras.optimizers import Adam
 
-from src.utils.helpers import count_files, LossHistory
+from src.utils.helpers import count_files #, LossHistory
 
 parser = argparse.ArgumentParser()
 # Data structure arguments
-parser.add_argument("-train_dir", "--train_dir", type=str, default="data/cubic/6folds_128/fold0/train/",
+parser.add_argument("-train_dir", "--train_dir", type=str, default="../data/all_data/6folds_128/fold0/train/",
                     help="Train directory. Contains subdirs separating images in classes.")
-parser.add_argument("-val_dir", "--val_dir", type=str, default="data/cubic/6folds_128/fold0/test/",
+parser.add_argument("-val_dir", "--val_dir", type=str, default="../data/all_data/6folds_128/fold0/test/",
                     help="Validation directory. Contains subdirs separating images in classes.")
 parser.add_argument("-output_dir", "--output_dir", type=str, default="output/test/",
                     help="Output directory")
@@ -43,8 +43,8 @@ parser.add_argument("-l", "--learning_rate", type=float, default=0.00001)
 
 args = parser.parse_args()
 print("Arguments:", args)
-mlflow.start_run(run_name=args.name)
-mlflow.log_params(vars(args))
+# mlflow.start_run(run_name=args.name)
+# mlflow.log_params(vars(args))
 
 datetime_now = datetime.now().strftime("%Y%m%d-%H%M%S")
 TRAIN_DIR = args.train_dir
@@ -140,14 +140,14 @@ print(finetune_model.summary())
 # checkpoint = ModelCheckpoint(filepath, monitor=["acc"], verbose=1, mode="max")
 # callbacks_list = [checkpoint]
 
-loss_history = LossHistory()
+# loss_history = LossHistory()
 # additional = AdditionalValidationGenerators({"test_defective": test_def_gen,
 #                                              "test_nondefective": test_nondef_gen,
 #                                              "train_m": train_gen}, verbose=2, steps=1, gpu=gpu)
 # early_stopping = EarlyStopping(monitor='val_loss', mode='min', patience=50, min_delta=0.1)
 
 callbacks = []
-callbacks.append(loss_history)
+# callbacks.append(loss_history)
 # callbacks.append(additional)
 
 # callbacks_list = []
@@ -176,7 +176,7 @@ model_history_path = os.path.join(
 with open(model_history_path, "w") as f:
     json.dump(str(history.history), f)
 print("Saved history under {}".format(model_history_path))
-mlflow.log_artifact(model_history_path)
+# mlflow.log_artifact(model_history_path)
 print("Logged history.")
 
 print("Training time: {}s".format(time()-starttime))

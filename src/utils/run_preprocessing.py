@@ -15,11 +15,11 @@ def run(DIR_PARENT, DIR_DEFECTIVE, DIR_NONDEFECTIVE, DIR_FOLDS):
     # Define image patches
     TARGET_SIZE = 128
     # Define fold splitting settings
-    KFOLD = 2
-    N_SPLITS = 2
+    KFOLD = 6
+    N_SPLITS = 6
     # Define augmentation settings
-    AUGMENTATION_FACTOR = 2#0  # Multiplying n_images by this factor with rotating and flipping
-    BATCH_SIZE = 100  # Number of sampled patches
+    AUGMENTATION_FACTOR = 20  # Multiplying n_images by this factor with rotating and flipping
+    BATCH_SIZE = 10000  # Number of sampled patches
     THRESHOLD_DEFECTIVE = 0.1  # Lower limit for normalized defective area in order to be classified 'defective'
     THRESHOLD_NONDEFECTIVE = 0.01  # Upper limit for normalized defective area in order to be classified 'non_defective'
 

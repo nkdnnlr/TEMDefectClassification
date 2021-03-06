@@ -507,7 +507,7 @@ def get_best_node_from_Kneighbors(G, k=10, connectivity=4):
 #     """
 #     Keras Callback that allows logging on MLFlow after each epoch end
 #     """
-
+#
 #     def on_epoch_end(self, epoch, logs=None):
 #         metrics = logs.keys()
 #         for metric in metrics:

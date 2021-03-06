@@ -12,9 +12,9 @@ parser = argparse.ArgumentParser()
 # Data structure arguments
 parser.add_argument("-file", "--file", type=str, default="all_data.zip",
                     help="Name of zipped data file.")
-parser.add_argument("-unzip", "--unzip", type=bool, default=False,
+parser.add_argument("-unzip", "--unzip", type=bool, default=True,
                     help="Unzip?")
-parser.add_argument("-labels", "--labels", type=bool, default=False,
+parser.add_argument("-labels", "--labels", type=bool, default=True,
                     help="Convert annotations to labels?")
 parser.add_argument("-preprocessing", "--preprocessing", type=bool, default=True,
                     help="Preprocessing?.")
