@@ -15,8 +15,9 @@ from keras.preprocessing.image import ImageDataGenerator
 from keras.layers import Dense, Flatten, Dropout
 from keras.models import Model
 from keras.optimizers import Adam
+from keras.callbacks import History
 
-from src.utils.helpers import count_files #, LossHistory
+from src.utils.helpers import count_files, LossHistory
 
 parser = argparse.ArgumentParser()
 # Data structure arguments
@@ -140,13 +141,16 @@ print(finetune_model.summary())
 # checkpoint = ModelCheckpoint(filepath, monitor=["acc"], verbose=1, mode="max")
 # callbacks_list = [checkpoint]
 
-# loss_history = LossHistory()
+loss_history = LossHistory()
 # additional = AdditionalValidationGenerators({"test_defective": test_def_gen,
 #                                              "test_nondefective": test_nondef_gen,
 #                                              "train_m": train_gen}, verbose=2, steps=1, gpu=gpu)
 # early_stopping = EarlyStopping(monitor='val_loss', mode='min', patience=50, min_delta=0.1)
 
 callbacks = []
+
+history_ = History()
+callbacks.append(history_)
 # callbacks.append(loss_history)
 # callbacks.append(additional)
 
@@ -164,6 +168,8 @@ history = finetune_model.fit_generator(
     verbose=2
 )
 
+print(history_)
+print(history)
 # Save model
 model_path = os.path.join(OUTPUT_DIR, "model.h5")
 finetune_model.save(model_path)
