@@ -20,8 +20,8 @@ def run(DIR_PARENT, DIR_DEFECTIVE, DIR_NONDEFECTIVE, DIR_FOLDS):
     # Define augmentation settings
     AUGMENTATION_FACTOR = 20  # Multiplying n_images by this factor with rotating and flipping
     BATCH_SIZE = 10000  # Number of sampled patches
-    THRESHOLD_DEFECTIVE = 0.1  # Lower limit for normalized defective area in order to be classified 'defective'
-    THRESHOLD_NONDEFECTIVE = 0.01  # Upper limit for normalized defective area in order to be classified 'non_defective'
+    THRESHOLD_DEFECTIVE = 0.05  # Lower limit for normalized defective area in order to be classified 'defective'
+    THRESHOLD_NONDEFECTIVE = 0.05  # Upper limit for normalized defective area in order to be classified 'non_defective'
 
     dirs = [DIR_DEFECTIVE]#, DIR_NONDEFECTIVE]
     for dir in dirs:
@@ -50,7 +50,7 @@ def run(DIR_PARENT, DIR_DEFECTIVE, DIR_NONDEFECTIVE, DIR_FOLDS):
         randomcrop_folds(dir_data=dir_target, crop_target=TARGET_SIZE, batch_size=BATCH_SIZE, intensity_flip=True)
 
         # exit()
-        # sort_folds_by_label(dir_target=dir_target, n_folds=N_SPLITS, threshold_defective=THRESHOLD_DEFECTIVE, threshold_nondefective=THRESHOLD_NONDEFECTIVE, nolabels=False)
+        # sort_folds_by_label(dir_target=dir_target, n_folds=N_SPLITS, thr_def=THRESHOLD_DEFECTIVE, thr_nondef=THRESHOLD_NONDEFECTIVE, nolabels=False)
         print("SORT FOLD BY LABEL...")
         sort_folds_by_label_(dir_target=dir_target, n_folds=N_SPLITS, threshold_defective=THRESHOLD_DEFECTIVE,
                              threshold_nondefective=THRESHOLD_NONDEFECTIVE, nolabels=False)

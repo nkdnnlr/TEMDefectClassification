@@ -149,8 +149,8 @@ print(finetune_model.summary())
 
 callbacks = []
 
-history_ = History()
-callbacks.append(history_)
+# history_ = History()
+# callbacks.append(history_)
 # callbacks.append(loss_history)
 # callbacks.append(additional)
 
@@ -168,8 +168,8 @@ history = finetune_model.fit_generator(
     verbose=2
 )
 
-print(history_)
-print(history)
+# print(history_)
+# print(history)
 # Save model
 model_path = os.path.join(OUTPUT_DIR, "model.h5")
 finetune_model.save(model_path)

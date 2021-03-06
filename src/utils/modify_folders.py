@@ -71,11 +71,11 @@ def sort_folds_by_label_(dir_target, n_folds, threshold_defective=0.1, threshold
     for fold in tqdm.trange(n_folds):
         print("Sort fold{} by label".format(fold))
         print("train")
-        sort_by_label_(dir_target + "/fold{}/train".format(str(fold)), threshold_defective=threshold_defective,
-        threshold_nondefective=threshold_nondefective, nolabels=nolabels)
+        sort_by_label_(dir_target + "/fold{}/train".format(str(fold)), thr_def=threshold_defective,
+                       thr_nondef=threshold_nondefective, nolabels=nolabels)
         print("test")
-        sort_by_label_(dir_target + "/fold{}/test".format(str(fold)), threshold_defective=threshold_defective,
-                       threshold_nondefective=threshold_nondefective, nolabels=nolabels)
+        sort_by_label_(dir_target + "/fold{}/test".format(str(fold)), thr_def=threshold_defective,
+                       thr_nondef=threshold_nondefective, nolabels=nolabels)
 
 
 def sort_by_label(dir_data, threshold_defective=0.1, threshold_nondefective=0.01, nolabels=False):
@@ -135,12 +135,12 @@ def sort_by_label(dir_data, threshold_defective=0.1, threshold_nondefective=0.01
                 shutil.copy(file_image, dir_neglecting_images)
                 shutil.copy(file_label, dir_neglecting_labels)
 
-def sort_by_label_(dir_data, threshold_defective=0.1, threshold_nondefective=0.01, nolabels=False):
+def sort_by_label_(dir_data, thr_def=0.1, thr_nondef=0.01, nolabels=False):
     """
 
     :param dir_data:
-    :param threshold_defective:
-    :param threshold_nondefective:
+    :param thr_def:
+    :param thr_nondef:
     :param nolabels:
     :return:
     """
@@ -201,8 +201,8 @@ def sort_by_label_(dir_data, threshold_defective=0.1, threshold_nondefective=0.0
                 pass
             # print(r_nondef, r_def, r_blur)
 
-            thr_def = 0.1
-            thr_nondef = 0.01
+            # thr_def = 0.1
+            # thr_nondef = 0.01
 
             # Defective
             if r_blur > thr_def:
