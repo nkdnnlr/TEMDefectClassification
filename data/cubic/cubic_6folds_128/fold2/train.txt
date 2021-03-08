@@ -1,0 +1,11 @@
+0: JEOL BF 35 SIH11 no annotation.tif
+3: JEOL BF 14_SIH05 no annotation.tif
+4: JEOL BF 05 SIH09 no annotation.tif
+5: JEOL BF 05 SF x 10 M no annotation.tif
+6: JEOL BF 12_SIH05 no annotation.tif
+7: JEOL BF 06 SIH09 no annotation.tif
+8: JEOL BF 50_SIH05 no annotation.tif
+9: JEOL BF 17_SIH05 no annotation.tif
+10: JEOL BF 19_SIH05 no annotation.tif
+11: JEOL BF 07 LT15B_SIH06 no annotation.tif
+12: JEOL BF defect top left x 10 M a no annotation.tif

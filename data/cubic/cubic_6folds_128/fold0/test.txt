@@ -1,0 +1,3 @@
+0: JEOL BF 35 SIH11 no annotation.tif
+9: JEOL BF 17_SIH05 no annotation.tif
+11: JEOL BF 07 LT15B_SIH06 no annotation.tif
