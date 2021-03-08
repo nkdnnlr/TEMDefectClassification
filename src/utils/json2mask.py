@@ -102,6 +102,9 @@ def plot_labels(source_dir,
     :param show:
     :return:
     """
+    # if not os.path.exists(output_dir):
+    #     os.mkdir(output_dir)
+
     output_dir.mkdir(parents=True, exist_ok=True)
 
     for filename in os.listdir(source_dir):

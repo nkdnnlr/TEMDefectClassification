@@ -29,7 +29,7 @@ parser.add_argument("-output_dir", "--output_dir", type=str, default="output/tes
                     help="Output directory")
 parser.add_argument("-base", "--base_model", type=str, default="VGG16",
                     help="Keras Base model for transfer learning. So far tried 'VGG16', 'ResNet50'")
-parser.add_argument("-weights", "--weights", type=str, default=None,
+parser.add_argument("-weights", "--weights", type=str, default='imagenet',
                     help="Weights for model. Either 'imagenet' or None.")
 parser.add_argument("-name", "--name", type=str, default="CNN_VGG16", help="Name for mlflow logging.")
 # Architecture arguments
@@ -38,7 +38,7 @@ parser.add_argument("-train_all", "--train_all", type=bool, default=False,
 parser.add_argument("-fc", "--fc_layers", nargs='+', type=int, help="FC layers", )
 parser.add_argument("-d", "--dropout", type=float, default=0.5, help="Dropout fraction", )
 # Training arguments
-parser.add_argument("-e", "--epochs", type=int, default=3, help="Epochs")
+parser.add_argument("-e", "--epochs", type=int, default=60, help="Epochs")
 parser.add_argument("-b", "--batch_size", type=int, default=8, help="Batch size. Scales steps accordingly.")
 parser.add_argument("-l", "--learning_rate", type=float, default=0.00001)
 
@@ -47,150 +47,160 @@ print("Arguments:", args)
 # mlflow.start_run(run_name=args.name)
 # mlflow.log_params(vars(args))
 
-# TRAIN_DIR = args.train_dir
-# VAL_DIR = args.val_dir
-for f in [0, 1, 2, 3, 4, 5]:
-    print(f"FOLD{f}")
-    TRAIN_DIR = f"data/all_data/6folds_128/fold{f}/train/"
-    VAL_DIR = f"data/all_data/6folds_128/fold{f}/test/"
-    datetime_now = datetime.now().strftime("%Y%m%d-%H%M%S")
+def train_cnn(dir_folds, output_dir, n_folds):
+    for f in range(n_folds):
+        print(f"FOLD{f}")
 
-    TRAIN_TOTAL = count_files(TRAIN_DIR)
-    VAL_TOTAL = count_files(VAL_DIR)
-    class_list = ["defective", "non_defective"]
-    HEIGHT = 128  # Height of image. Optimally, for ResNet50, this should be equal to 224
-    WIDTH = 128  # Width of image. Optimally, for ResNet50, this should be equal to 224
-    FC_LAYERS = args.fc_layers
-    FC_LAYERS = [1024, 1024, 512]
-    DROPOUT = args.dropout
-    BATCH_SIZE = args.batch_size
-    NUM_EPOCHS = args.epochs
-    OUTPUT_DIR = os.path.join(args.output_dir, datetime_now + f"fold{f}")
+        TRAIN_DIR = os.path.join(dir_folds, f'fold{f}', 'train')
+        VAL_DIR = os.path.join(dir_folds, f'fold{f}', 'test')
+        datetime_now = datetime.now().strftime("%Y%m%d-%H%M%S")
+        OUTPUT_DIR = os.path.join(output_dir, f"fold{f}_" + datetime_now)
 
-    if not os.path.exists(OUTPUT_DIR):
-        os.makedirs(OUTPUT_DIR)
+#     pass
+# # TRAIN_DIR = args.train_dir
+# # VAL_DIR = args.val_dir
+# for f in [0, 1, 2, 3, 4, 5]:
+#     print(f"FOLD{f}")
+#     TRAIN_DIR = f"data/all_data/6folds_128/fold{f}/train/"
+#     VAL_DIR = f"data/all_data/6folds_128/fold{f}/test/"
+#     datetime_now = datetime.now().strftime("%Y%m%d-%H%M%S")
 
-    print("Total files in TRAIN_DIR: {}".format(TRAIN_TOTAL))
-    print("Total files in VAL_DIR: {}".format(VAL_TOTAL))
+        TRAIN_TOTAL = count_files(TRAIN_DIR)
+        VAL_TOTAL = count_files(VAL_DIR)
+        class_list = ["defective", "non_defective"]
+        HEIGHT = 128  # Height of image. Optimally, for ResNet50, this should be equal to 224
+        WIDTH = 128  # Width of image. Optimally, for ResNet50, this should be equal to 224
+        FC_LAYERS = args.fc_layers
+        FC_LAYERS = [1024, 1024, 512]
+        DROPOUT = args.dropout
+        BATCH_SIZE = args.batch_size
+        NUM_EPOCHS = args.epochs
+        # OUTPUT_DIR = os.path.join(args.output_dir, datetime_now + f"fold{f}")
 
-    # Load Base model with weights. Skip top layer
+        if not os.path.exists(OUTPUT_DIR):
+            os.makedirs(OUTPUT_DIR)
 
-    base_models = {"VGG16": VGG16,
-                   "ResNet50": ResNet50}
+        print("Total files in TRAIN_DIR: {}".format(TRAIN_TOTAL))
+        print("Total files in VAL_DIR: {}".format(VAL_TOTAL))
 
-    base_model = base_models[args.base_model](
-        weights=args.weights, include_top=False, input_shape=(HEIGHT, WIDTH, 3)
-    )
+        # Load Base model with weights. Skip top layer
 
-    train_datagen = ImageDataGenerator(
-        preprocessing_function=preprocess_input,
-    )
+        base_models = {"VGG16": VGG16,
+                       "ResNet50": ResNet50}
 
-    val_datagen = ImageDataGenerator(
-        preprocessing_function=preprocess_input,
-    )
+        base_model = base_models[args.base_model](
+            weights=args.weights, include_top=False, input_shape=(HEIGHT, WIDTH, 3)
+        )
 
-    train_generator = train_datagen.flow_from_directory(
-        TRAIN_DIR, target_size=(HEIGHT, WIDTH), batch_size=BATCH_SIZE
-    )
+        train_datagen = ImageDataGenerator(
+            preprocessing_function=preprocess_input,
+        )
 
-    val_generator = val_datagen.flow_from_directory(
-        VAL_DIR, target_size=(HEIGHT, WIDTH), batch_size=BATCH_SIZE
-    )
+        val_datagen = ImageDataGenerator(
+            preprocessing_function=preprocess_input,
+        )
 
+        train_generator = train_datagen.flow_from_directory(
+            TRAIN_DIR, target_size=(HEIGHT, WIDTH), batch_size=BATCH_SIZE
+        )
 
-
-    def build_finetune_model(base_model, dropout, fc_layers, num_classes):
-        """
-        Build upon last layer of base_model. This allows finetuning to our data set.
-        :param base_model:
-        :param dropout:
-        :param fc_layers:
-        :param num_classes:
-        :return:
-        """
-        for layer in base_model.layers:
-            layer.trainable = args.train_all
-
-        x = base_model.output
-        x = Flatten()(x)
-        if fc_layers is not None:
-            for fc in fc_layers:
-                # New FC layer, random init
-                x = Dense(fc, activation="relu")(x)
-                if dropout is not None:
-                    x = Dropout(dropout)(x)
-
-        # New softmax layer
-        predictions = Dense(num_classes, activation="softmax")(x)
-
-        finetune_model = Model(inputs=base_model.input, outputs=predictions)
-
-        return finetune_model
+        val_generator = val_datagen.flow_from_directory(
+            VAL_DIR, target_size=(HEIGHT, WIDTH), batch_size=BATCH_SIZE
+        )
 
 
-    finetune_model = build_finetune_model(
-        base_model, dropout=DROPOUT, fc_layers=FC_LAYERS, num_classes=len(class_list)
-    )
 
-    # finetune_model = simple_cnn(num_classes=len(class_list))
+        def build_finetune_model(base_model, dropout, fc_layers, num_classes):
+            """
+            Build upon last layer of base_model. This allows finetuning to our data set.
+            :param base_model:
+            :param dropout:
+            :param fc_layers:
+            :param num_classes:
+            :return:
+            """
+            for layer in base_model.layers:
+                layer.trainable = args.train_all
 
-    # In[4]
-    adam = Adam(lr=args.learning_rate)
-    finetune_model.compile(adam, loss="categorical_crossentropy", metrics=["accuracy"])
-    print(finetune_model.summary())
+            x = base_model.output
+            x = Flatten()(x)
+            if fc_layers is not None:
+                for fc in fc_layers:
+                    # New FC layer, random init
+                    x = Dense(fc, activation="relu")(x)
+                    if dropout is not None:
+                        x = Dropout(dropout)(x)
 
-    # exit()
+            # New softmax layer
+            predictions = Dense(num_classes, activation="softmax")(x)
 
-    # filepath = "./checkpoints/" + "ResNet50" + "_model_weights.h5"
-    # checkpoint = ModelCheckpoint(filepath, monitor=["acc"], verbose=1, mode="max")
-    # callbacks_list = [checkpoint]
+            finetune_model = Model(inputs=base_model.input, outputs=predictions)
 
-    # loss_history = LossHistory()
-    # additional = AdditionalValidationGenerators({"test_defective": test_def_gen,
-    #                                              "test_nondefective": test_nondef_gen,
-    #                                              "train_m": train_gen}, verbose=2, steps=1, gpu=gpu)
-    # early_stopping = EarlyStopping(monitor='val_loss', mode='min', patience=50, min_delta=0.1)
+            return finetune_model
 
-    callbacks = []
 
-    # history_ = History()
-    # callbacks.append(history_)
-    # callbacks.append(loss_history)
-    # callbacks.append(additional)
+        finetune_model = build_finetune_model(
+            base_model, dropout=DROPOUT, fc_layers=FC_LAYERS, num_classes=len(class_list)
+        )
 
-    # callbacks_list = []
-    starttime = time()
-    history = finetune_model.fit_generator(
-        train_generator,
-        epochs=NUM_EPOCHS,
-        workers=8,
-        steps_per_epoch=TRAIN_TOTAL // BATCH_SIZE,
-        shuffle=True,
-        validation_data=val_generator,
-        validation_steps=VAL_TOTAL // (BATCH_SIZE),
-        callbacks=callbacks,
-        verbose=2
-    )
+        # finetune_model = simple_cnn(num_classes=len(class_list))
 
-    # print(history_)
-    # print(history)
-    # Save model
-    model_path = os.path.join(OUTPUT_DIR, "model.h5")
-    finetune_model.save(model_path)
-    print("Saved model under {}".format(model_path))
+        # In[4]
+        adam = Adam(lr=args.learning_rate)
+        finetune_model.compile(adam, loss="categorical_crossentropy", metrics=["accuracy"])
+        print(finetune_model.summary())
 
-    # Save model history
-    model_history_path = os.path.join(
-        OUTPUT_DIR, "trainHistoryDict.json")
+        # exit()
 
-    with open(model_history_path, "w") as f:
-        json.dump(str(history.history), f)
-    print("Saved history under {}".format(model_history_path))
-    # mlflow.log_artifact(model_history_path)
-    print("Logged history.")
+        # filepath = "./checkpoints/" + "ResNet50" + "_model_weights.h5"
+        # checkpoint = ModelCheckpoint(filepath, monitor=["acc"], verbose=1, mode="max")
+        # callbacks_list = [checkpoint]
 
-    print("Training time: {}s".format(time()-starttime))
+        # loss_history = LossHistory()
+        # additional = AdditionalValidationGenerators({"test_defective": test_def_gen,
+        #                                              "test_nondefective": test_nondef_gen,
+        #                                              "train_m": train_gen}, verbose=2, steps=1, gpu=gpu)
+        # early_stopping = EarlyStopping(monitor='val_loss', mode='min', patience=50, min_delta=0.1)
+
+        callbacks = []
+
+        # history_ = History()
+        # callbacks.append(history_)
+        # callbacks.append(loss_history)
+        # callbacks.append(additional)
+
+        # callbacks_list = []
+        starttime = time()
+        history = finetune_model.fit_generator(
+            train_generator,
+            epochs=NUM_EPOCHS,
+            workers=8,
+            steps_per_epoch=TRAIN_TOTAL // BATCH_SIZE,
+            shuffle=True,
+            validation_data=val_generator,
+            validation_steps=VAL_TOTAL // (BATCH_SIZE),
+            callbacks=callbacks,
+            verbose=2
+        )
+
+        # print(history_)
+        # print(history)
+        # Save model
+        model_path = os.path.join(OUTPUT_DIR, "model.h5")
+        finetune_model.save(model_path)
+        print("Saved model under {}".format(model_path))
+
+        # Save model history
+        model_history_path = os.path.join(
+            OUTPUT_DIR, "trainHistoryDict.json")
+
+        with open(model_history_path, "w") as f:
+            json.dump(str(history.history), f)
+        print("Saved history under {}".format(model_history_path))
+        # mlflow.log_artifact(model_history_path)
+        print("Logged history.")
+
+        print("Training time: {}s".format(time()-starttime))
 
 print("Done.")
 

@@ -18,14 +18,14 @@ def balance(dir1, dir2):
     :param dir2: Path to first directory
     :return:
     """
-    print("Balance directories")
+    # print("Balance directories")
 
     files1 = os.listdir(dir1)
     files2 = os.listdir(dir2)
     n1 = len(files1)
     n2 = len(files2)
     if n1 == n2:
-        print("equal")
+        # print("equal")
         return
     else:
         n_min = min(n1, n2)
@@ -240,10 +240,11 @@ def remove_redundant_dirs(dir_target, n_folds, *args):
             for arg in args:
                 path_to_delete = os.path.join(dir, arg)
                 if os.path.exists(path_to_delete):
-                    print("Deleting directory at {}".format(path_to_delete))
+                    # print("Deleting directory at {}".format(path_to_delete))
                     shutil.rmtree(path_to_delete, ignore_errors=True)
                 else:
-                    print("Directory at {} doesn't exist".format(path_to_delete))
+                    # print("Directory at {} doesn't exist".format(path_to_delete))
+                    pass
 
 
 def make_cnn_structure(dir_target, dir_output, fold=0, balanced=True):
@@ -320,10 +321,10 @@ def make_cnn_structure(dir_target, dir_output, fold=0, balanced=True):
 
     for target_dir in target_dirs:
         # print(target_dir)
-        print("HERE")
+        # print("HERE")
         cwd = os.getcwd()
-        print(cwd)
-        print(target_dir)
+        # print(cwd)
+        # print(target_dir)
         assert os.path.isdir(target_dir)
 
     cnn_fold = os.path.join(dir_output, "fold{}".format(fold))
