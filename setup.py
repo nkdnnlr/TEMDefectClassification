@@ -136,11 +136,11 @@ for n_train in [16, 14]:#range(2,10):
 
     params = {
         "N_TRAIN": n_train,
-        "N_TEST": 4,
-        "N_FOLDS": 8,
+        "N_TEST": 6,
+        "N_FOLDS": 10,
         "TARGET_SIZE": 128,
         "AUGMENTATION_FACTOR": 40,  # Multiplying n_images by this factor with rotating and flipping
-        "BATCH_SIZE": 100,  # Number of sampled patches
+        "BATCH_SIZE": 20000,  # Number of sampled patches
         "THRESHOLD_DEFECTIVE": 0.1,  # Lower limit for normalized defective area in order to be classified 'defective'
         "THRESHOLD_NONDEFECTIVE": 0.01,
         # Upper limit for normalized defective area in order to be classified 'non_defective'
