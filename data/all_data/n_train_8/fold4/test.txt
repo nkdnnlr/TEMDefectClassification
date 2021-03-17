@@ -1,0 +1,6 @@
+19: JEOL BF 50_SIH05 no annotation.tif
+0: JEOL BF 35 SIH11 no annotation.tif
+3: JEOL BF 06_lou no annotation.tif
+16: JEOL_ADF1_8M_SOU76posB_Tunnel2Defect1.tif
+10: JEOL ADF1_10 M_SOU76posB_Tunnel5_ Boundary between Seed 2 and 3.tif
+6: JEOL BF 05 SF x 10 M no annotation.tif

@@ -1,0 +1,20 @@
+11: JEOL_ADF1_10M_SOU76posB_Tunnel4GrainBoundary1Seed1.tif
+21: JEOL_ADF1_10M_SOU76posB_Tunnel2CrystalEdge1.tif
+27: JEOL_ADF1_10M_SOU76posB_Tunnel5Seed1DefectMeet1.tif
+15: JEOL_ADF1_10M_SOU76posB_Tunnel5Seed3-4DefectA.tif
+20: JEOL BF 17_SIH05 no annotation.tif
+24: JEOL_ADF1_10M_SOU76posB_Tunnel4GrainBoundary2Seed3Edge.tif
+17: JEOL_ADF1_10M_SOU76posB_Tunnel5GrainBoundary2Seed3.tif
+25: JEOL BF 19_SIH05 no annotation.tif
+19: JEOL BF 50_SIH05 no annotation.tif
+0: JEOL BF 35 SIH11 no annotation.tif
+3: JEOL BF 06_lou no annotation.tif
+16: JEOL_ADF1_8M_SOU76posB_Tunnel2Defect1.tif
+10: JEOL ADF1_10 M_SOU76posB_Tunnel5_ Boundary between Seed 2 and 3.tif
+6: JEOL BF 05 SF x 10 M no annotation.tif
+12: JEOL_ADF1_10M_SOU76posB_Tunnel2GrainBoundary1B.tif
+2: JEOL_ADF1_10M_SOU76posB_Tunnel5Seed1Defect1.tif
+4: JEOL BF 14_SIH05 no annotation.tif
+22: JEOL_ADF1_10M_SOU76posB_Tunnel4GrainBoundary2Seed2Edge.tif
+13: JEOL_ADF1_10M_SOU76posB_Tunnel3GrainBoundary2Seed3Edge.tif
+7: JEOL_ADF1_10M_SOU76posB_Tunnel4GrainBoundary3Seed4Edge.tif

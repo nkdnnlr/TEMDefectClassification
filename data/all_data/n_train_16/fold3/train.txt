@@ -1,0 +1,16 @@
+18: JEOL BF 06 SIH09 no annotation.tif
+17: JEOL_ADF1_10M_SOU76posB_Tunnel5GrainBoundary2Seed3.tif
+12: JEOL_ADF1_10M_SOU76posB_Tunnel2GrainBoundary1B.tif
+26: JEOL BF 07 LT15B_SIH06 no annotation.tif
+15: JEOL_ADF1_10M_SOU76posB_Tunnel5Seed3-4DefectA.tif
+16: JEOL_ADF1_8M_SOU76posB_Tunnel2Defect1.tif
+13: JEOL_ADF1_10M_SOU76posB_Tunnel3GrainBoundary2Seed3Edge.tif
+2: JEOL_ADF1_10M_SOU76posB_Tunnel5Seed1Defect1.tif
+1: JEOL BF defect at Xtal boundaries 01_svm_SOU52 ring right part no annotation.tif
+23: JEOL_ADF1_10M_SOU76posB_Tunnel5Seed1DefectV.tif
+14: JEOL_ADF1_10M_SOU76posB_Tunnel2GrainBoundary1.tif
+4: JEOL BF 14_SIH05 no annotation.tif
+22: JEOL_ADF1_10M_SOU76posB_Tunnel4GrainBoundary2Seed2Edge.tif
+6: JEOL BF 05 SF x 10 M no annotation.tif
+7: JEOL_ADF1_10M_SOU76posB_Tunnel4GrainBoundary3Seed4Edge.tif
+5: JEOL BF 05 SIH09 no annotation.tif
