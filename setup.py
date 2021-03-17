@@ -37,7 +37,7 @@ cwd = os.getcwd()
 
 # Specify Directories where data is or is going to be
 parent_dir, name, image_format = re.split('\.|\/', DATA_ZIPFILE)
-print(parent_dir)
+# print(parent_dir)
 
 dir_data = os.path.join(parent_dir, name)
 
@@ -123,9 +123,12 @@ if LABELS:
 #             show=False)
 # exit()
 
-for n_train in range(6,25+1):
-
+for n_train in [16, 14]:#range(2,10):
+# while True:
+#     n_train = 2
     dir_folds = os.path.join(dir_data, f'n_train_{n_train}')
+    # dir_folds = os.path.join(f'output', name, 'test2', f'n_train_{n_train}')
+
     dir_output = os.path.join(f'output', name, f'n_train_{n_train}')
 
     print(dir_folds)
@@ -137,7 +140,7 @@ for n_train in range(6,25+1):
         "N_FOLDS": 8,
         "TARGET_SIZE": 128,
         "AUGMENTATION_FACTOR": 40,  # Multiplying n_images by this factor with rotating and flipping
-        "BATCH_SIZE": 20000,  # Number of sampled patches
+        "BATCH_SIZE": 100,  # Number of sampled patches
         "THRESHOLD_DEFECTIVE": 0.1,  # Lower limit for normalized defective area in order to be classified 'defective'
         "THRESHOLD_NONDEFECTIVE": 0.01,
         # Upper limit for normalized defective area in order to be classified 'non_defective'

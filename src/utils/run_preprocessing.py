@@ -66,7 +66,7 @@ def run(DIR_PARENT, DIR_DEFECTIVE, DIR_NONDEFECTIVE, DIR_FOLDS, PARAMS):
 
         # Deleting redundant files to save storage
         print("REMOVE REDUNDANT DIRS...")
-        remove_redundant_dirs(dir_target, N_FOLDS, "augmented", "patches")
+        # remove_redundant_dirs(dir_target, N_FOLDS, "augmented", "patches")
 
     # For each fold, make CNN structure
     for fold in tqdm.trange(N_FOLDS):
