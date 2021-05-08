@@ -64,7 +64,7 @@ def rescale_intensity(image, p_range=(2, 98)):
     p2, p98 = percentile(image, p_range)
     return exposure.rescale_intensity(image, in_range=(p2, p98))
 
-def cut_intensity(image, min, max):
+def cut_intensity(image, min=None, max=None):
     """
 
     Args:
@@ -80,13 +80,20 @@ def cut_intensity(image, min, max):
     return image_cut    
     
     
-def normalize_intensity(image):
+def normalize_intensity(image, max=None):
     """Normalize the intensity to range [0, 1]
     Args:
         image ([type]): Numpy array of image
     """
     image = (image - np.min(image))
-    image = image / np.max(image)
+    if max is None:
+        image = image / np.max(image)
+    else:
+        if max>np.max(image):
+            print("now")
+            image = image / max
+        else:
+            image = image / np.max(image)
     return image
 
 def preprocess_image(image,
