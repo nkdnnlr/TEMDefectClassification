@@ -82,11 +82,11 @@ def run(DIR_PARENT, DIR_DEFECTIVE, DIR_NONDEFECTIVE, DIR_FOLDS, PARAMS):
             print("Deleting directory at {}".format(dir_target))
             shutil.rmtree(dir_target, ignore_errors=True)
 
-
-if __name__ == '__main__':
-    # Define directories
-    DIR_PARENT = "../../data/cubic"
-    DIR_DEFECTIVE = os.path.join(DIR_PARENT, "defective/")
-    DIR_NONDEFECTIVE = os.path.join(DIR_PARENT, "non_defective/")
-    DIR_FOLDS = os.path.join(DIR_PARENT, "6fold_128")
-    run(DIR_PARENT, DIR_DEFECTIVE, DIR_NONDEFECTIVE, DIR_FOLDS)
+#
+# if __name__ == '__main__':
+#     # Define directories
+#     DIR_PARENT = "../../data/cubic"
+#     DIR_DEFECTIVE = os.path.join(DIR_PARENT, "defective/")
+#     DIR_NONDEFECTIVE = os.path.join(DIR_PARENT, "non_defective/")
+#     DIR_FOLDS = os.path.join(DIR_PARENT, "6fold_128")
+#     run(DIR_PARENT, DIR_DEFECTIVE, DIR_NONDEFECTIVE, DIR_FOLDS)
