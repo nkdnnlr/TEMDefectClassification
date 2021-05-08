@@ -545,27 +545,7 @@ def get_best_node_from_Kneighbors(G, k=10, connectivity=4):
     value = max(weighted_neighbors.values())
     return best, value
 
-def create_poissonnoisy_images(image_dir, output_dir, a_max=1, a_min=0.001, steps=7):
 
-    image_dir = "/home/nik/UZH/IBM/TEMDefectClassification/data/all_data/defective_noise/images"
-    output_dir = "/home/nik/UZH/IBM/TEMDefectClassification/data/all_data/defective_noise/noise"
-
-    for idx, a in enumerate(np.logspace(np.log10(a_max), np.log10(a_min), steps)):
-        print(a)
-        # continue
-        noise_dir = os.path.join(output_dir, str(np.round(a,4)))
-        os.mkdir(noise_dir)
-
-        for name in os.listdir(image_dir):
-            file = os.path.join(image_dir, name)
-            print(file)
-            if not file.endswith('.tif'):
-                continue
-
-            image = get_image(file)
-            image_noisy = np.random.poisson(image*a)/a
-            im = Image.fromarray(np.uint8(image_noisy))
-            im.save(os.path.join(noise_dir, name))
 
 # class LossHistory(Callback):
 #     """
@@ -578,6 +558,3 @@ def create_poissonnoisy_images(image_dir, output_dir, a_max=1, a_min=0.001, step
 #             # print("metric: ", metric)
 #             mlflow.log_metric(metric, logs.get(metric), step=epoch)
 
-if __name__ == '__main__':
-    create_poissonnoisy_images('', '')
-    exit()
