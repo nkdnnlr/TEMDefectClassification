@@ -313,6 +313,45 @@ def map_scores(image, scores, target_size, step_size):
             i += 1
     return result
 
+def labels2classes(label_patches, thr_def = 0.05):
+    """
+    Visualizing labels by creating a heatmap, showing defective areas
+    :param image:
+    :param scores:
+    :return:
+    """
+    result = []
+    for patch_label in label_patches:
+
+        unique, count = np.unique(patch_label, return_counts=True)
+
+        pixel_dict = {u: c for u, c in zip(unique, count)}
+
+        r_nondef = 0
+        r_def = 0
+        r_blur = 0
+        try:
+            r_nondef = pixel_dict[0] / (128 * 128)
+        except KeyError:
+            pass
+        try:
+            r_def = pixel_dict[127] / (128 * 128)
+        except KeyError:
+            pass
+        try:
+            r_blur = pixel_dict[255] / (128 * 128)
+        except KeyError:
+            pass
+        # print(r_nondef, r_def, r_blur)
+
+        # Defective
+        if (r_blur > thr_def) or ((r_def > thr_def) and (r_def < (1 - thr_def))):
+            result.append(1)
+        else:
+            result.append(0)
+
+    return result
+
 
 def get_image_from_patches(image, patches, target_size=64, step=None, preprocess=False, special_patch=None):
     """
@@ -498,10 +537,35 @@ def get_best_node_from_Kneighbors(G, k=10, connectivity=4):
         for i in range(1, k+1):
             occurence = sum(value == i for value in nn.values())
             neighbors[node].append(occurence)
-            weighted_neighbors[node] += occurence/(math.factorial(i)*connectivity**i)
-    best = max(weighted_neighbors, key=weighted_neighbors.get)
-    return best
+            # weighted_neighbors[node] += occurence/(math.factorial(i)*connectivity**i)
+            weighted_neighbors[node] += occurence*(2*connectivity)**(1-i)/math.factorial(i)
 
+    weighted_neighbors = {key: value for key, value in sorted(weighted_neighbors.items(), key=lambda item: item[0])}
+    best = max(weighted_neighbors, key=weighted_neighbors.get)
+    value = max(weighted_neighbors.values())
+    return best, value
+
+def create_poissonnoisy_images(image_dir, output_dir, a_max=1, a_min=0.001, steps=7):
+
+    image_dir = "/home/nik/UZH/IBM/TEMDefectClassification/data/all_data/defective_noise/images"
+    output_dir = "/home/nik/UZH/IBM/TEMDefectClassification/data/all_data/defective_noise/noise"
+
+    for idx, a in enumerate(np.logspace(np.log10(a_max), np.log10(a_min), steps)):
+        print(a)
+        # continue
+        noise_dir = os.path.join(output_dir, str(np.round(a,4)))
+        os.mkdir(noise_dir)
+
+        for name in os.listdir(image_dir):
+            file = os.path.join(image_dir, name)
+            print(file)
+            if not file.endswith('.tif'):
+                continue
+
+            image = get_image(file)
+            image_noisy = np.random.poisson(image*a)/a
+            im = Image.fromarray(np.uint8(image_noisy))
+            im.save(os.path.join(noise_dir, name))
 
 # class LossHistory(Callback):
 #     """
@@ -513,3 +577,7 @@ def get_best_node_from_Kneighbors(G, k=10, connectivity=4):
 #         for metric in metrics:
 #             # print("metric: ", metric)
 #             mlflow.log_metric(metric, logs.get(metric), step=epoch)
+
+if __name__ == '__main__':
+    create_poissonnoisy_images('', '')
+    exit()
