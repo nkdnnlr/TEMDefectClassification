@@ -1,14 +1,14 @@
 # TEM-Defect-Classification
-Hi! You've reached the code repository corresponding to the paper ["Learning-based Defect Recognition for Quasi-Periodic Microscope Images"](https://doi.org/10.1016/j.micron.2021.103069), authored by Nik Dennler, Antonio Foncubierta-Rodriguez, Titus Neupert and Marilyne Sousa. In case of questions regarding the paper, please [write us](mailto:nik.dennler@posteo.de) 
-
-## Data
-The data used for this project is publicly available at [Zenodo](https://dx.doi.org/10.5281/zenodo.4739588). You can either download and use the data provided, or use your own data for re-traing the model and/or for testing the algorithm. 
+Hi! You've reached the code repository corresponding to the paper ["Learning-based Defect Recognition for Quasi-Periodic Microscope Images"](https://doi.org/10.1016/j.micron.2021.103069), authored by Nik Dennler, Antonio Foncubierta-Rodriguez, Titus Neupert and Marilyne Sousa. In case of questions regarding the paper, please [write us](mailto:nik.dennler@posteo.de). If you have an issue relating the code, please use the GitHub Issues function.
 
 ## Before you start
 Clone the repository, and set up the [conda](https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html) environment using
 ```
 conda env create -f environment.yml
 ```
+
+## Data
+The data used for this project is publicly available at [Zenodo](https://dx.doi.org/10.5281/zenodo.4739588). You can either download and use the data provided, or use your own data for re-traing the model and/or for testing the algorithm. 
 
 ## Training Model
 In order to re-train the model, you have to adjust the parameters in `setup.py` to suit your data directories, then simply run 
