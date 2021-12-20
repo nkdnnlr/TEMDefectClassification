@@ -1,6 +1,0 @@
-2: JEOL_ADF1_10M_SOU76posB_Tunnel5Seed1Defect1.tif
-15: JEOL_ADF1_10M_SOU76posB_Tunnel5Seed3-4DefectA.tif
-25: JEOL BF 19_SIH05 no annotation.tif
-22: JEOL_ADF1_10M_SOU76posB_Tunnel4GrainBoundary2Seed2Edge.tif
-12: JEOL_ADF1_10M_SOU76posB_Tunnel2GrainBoundary1B.tif
-10: JEOL ADF1_10 M_SOU76posB_Tunnel5_ Boundary between Seed 2 and 3.tif

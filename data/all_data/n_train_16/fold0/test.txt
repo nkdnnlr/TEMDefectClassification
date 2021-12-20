@@ -1,6 +1,0 @@
-28: JEOL BF defect top left x 10 M a no annotation.tif
-6: JEOL BF 05 SF x 10 M no annotation.tif
-4: JEOL BF 14_SIH05 no annotation.tif
-18: JEOL BF 06 SIH09 no annotation.tif
-19: JEOL BF 50_SIH05 no annotation.tif
-9: JEOL BF 12_SIH05 no annotation.tif

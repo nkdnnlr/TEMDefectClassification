@@ -12,6 +12,7 @@ warnings.filterwarnings("ignore", category=UserWarning)
 os.environ['KMP_WARNINGS'] = '0'
 
 import matplotlib.pyplot as plt
+# from tensorflow.
 from keras.models import load_model
 from keras.preprocessing.image import load_img, img_to_array
 import skimage
@@ -59,6 +60,15 @@ def run(parent_dir, model, output_dir_, TARGET_SIZE = 128, evaluate=True, verbos
         if file.endswith(".tif"):
             name = file[:-4]
 
+            output_dir_name = os.path.join(output_dir, name)
+            output_dir_svg = os.path.join(output_dir_name, 'svg')
+            output_dir_png = os.path.join(output_dir_name, 'png')
+            output_dir_npy = os.path.join(output_dir_name, 'npy')
+            if not os.path.exists(output_dir_name):
+                os.makedirs(output_dir_svg)
+                os.makedirs(output_dir_png)
+                os.makedirs(output_dir_npy)
+
             if run:
                 all_defective = False
 
@@ -68,8 +78,8 @@ def run(parent_dir, model, output_dir_, TARGET_SIZE = 128, evaluate=True, verbos
                 if verbose:
                     print("\nFile: " + file)
                 original = helpers.get_image(file)
-                plt.imsave(os.path.join(output_dir, name + "_original.png"), original, cmap='gray')
-                plt.imsave(os.path.join(output_dir, name + "_01_original.svg"), original, cmap='gray')
+                plt.imsave(os.path.join(output_dir_png, "01_original.png"), original, cmap='gray')
+                plt.imsave(os.path.join(output_dir_svg, "01_original.svg"), original, cmap='gray')
 
                 # # FOURIER SEGMENTATION
                 if verbose:
@@ -77,9 +87,12 @@ def run(parent_dir, model, output_dir_, TARGET_SIZE = 128, evaluate=True, verbos
                 fourier_segmentation_amorphous = bragg_filter_amorphous(original)
                 fourier_segmentation_symmetry =  bragg_filter_symmetry(original)*(-1)+1
                 fourier_segmentation_total = np.maximum.reduce([fourier_segmentation_amorphous*2, fourier_segmentation_symmetry])
-                np.save(os.path.join(output_dir, name + "fourier_segmentation.npy"), fourier_segmentation_total)
+                np.save(os.path.join(output_dir_npy, "fourier_segmentation.npy"), fourier_segmentation_total)
                 plt.imshow(fourier_segmentation_total, vmin=0, vmax=2)
-                plt.imsave(os.path.join(output_dir, name + "fourier_segmentation.svg"), fourier_segmentation_total, vmin=0, vmax=2)
+                plt.imsave(os.path.join(output_dir_png, "02_fourier_segmentation.png"), fourier_segmentation_total,
+                           vmin=0, vmax=2)
+                plt.imsave(os.path.join(output_dir_svg, "02_fourier_segmentation.svg"), fourier_segmentation_total,
+                           vmin=0, vmax=2)
                 # plt.show()
                 plt.close()
 
@@ -88,7 +101,8 @@ def run(parent_dir, model, output_dir_, TARGET_SIZE = 128, evaluate=True, verbos
                     print("Preprocessing...")
                 image = skimage.filters.gaussian(original, 2) - skimage.filters.gaussian(original, 3)
                 image = np.interp(image, (image.min(), image.max()), (0, 254))
-                plt.imsave(os.path.join(output_dir, name + "_02_preprocessed.svg"), image, cmap='gray')
+                plt.imsave(os.path.join(output_dir_png, "03_preprocessed.png"), image, cmap='gray')
+                plt.imsave(os.path.join(output_dir_svg, "03_preprocessed.svg"), image, cmap='gray')
 
                 # CROP IN PATCHES
                 STEP_SIZE = TARGET_SIZE
@@ -105,8 +119,8 @@ def run(parent_dir, model, output_dir_, TARGET_SIZE = 128, evaluate=True, verbos
                 fix, ax = plt.subplots(ncols=2)
                 ax[0].imshow(original)
                 ax[1].imshow(score_map)
-                plt.imsave(os.path.join(output_dir, name + "_predicted.png"), score_map, cmap='viridis')
-                plt.imsave(os.path.join(output_dir, name + "_03_predicted.svg"), score_map, cmap='viridis')
+                plt.imsave(os.path.join(output_dir_png, "04_predicted.png"), score_map, cmap='viridis')
+                plt.imsave(os.path.join(output_dir_svg, "04_predicted.svg"), score_map, cmap='viridis')
                 # plt.show()
                 plt.close()
                 sum_all += n_patches
@@ -131,18 +145,21 @@ def run(parent_dir, model, output_dir_, TARGET_SIZE = 128, evaluate=True, verbos
                         G_0, G_1, nx_pos = helpers.get_graph(class_matrix, connectivity=8)
                         best_node, value = helpers.get_best_node_from_Kneighbors(G_0, k=10, connectivity=8)
                 graph_fig, graph_ax = helpers.draw_graphs([G_0, G_1], nx_pos=nx_pos)
-                graph_fig.savefig(os.path.join(output_dir, name + "_04_graph.svg"))
+                graph_fig.savefig(os.path.join(output_dir_png, "05_graph.png"))
+                graph_fig.savefig(os.path.join(output_dir_svg, "05_graph.svg"))
                 plt.close(graph_fig)
 
                 # GET BEST PATCH
                 best_patch = patches[best_node]
-                np.save(os.path.join(output_dir, name + "bestpatch.npy"), best_patch)
+                np.save(os.path.join(output_dir_npy, "bestpatch.npy"), best_patch)
                 graph_fig, graph_ax = helpers.draw_graphs([G_0, G_1], nx_pos=nx_pos)
-                graph_fig.savefig(os.path.join(output_dir, name + "_04_graph.svg"))
+                graph_fig.savefig(os.path.join(output_dir_svg, "06_graph.svg"))
+                graph_fig.savefig(os.path.join(output_dir_png, "06_graph.png"))
                 plt.close(graph_fig)
                 graph_fig_best, graph_ax_best = helpers.draw_graphs([G_0, G_1], nx_pos=nx_pos, extra_nodes=[best_node])
-                # graph_fig_best.savefig(os.path.join(output_dir, name + "_05_graph_best.png"))
-                graph_fig_best.savefig(os.path.join(output_dir, name + "_05_graph_best.svg"))
+                # graph_fig_best.savefig(os.path.join(output_dir_name, "05_graph_best.png"))
+                graph_fig_best.savefig(os.path.join(output_dir_png, "07_graph_best.png"))
+                graph_fig_best.savefig(os.path.join(output_dir_svg, "07_graph_best.svg"))
                 # plt.show()
                 plt.close(graph_fig_best)
 
@@ -157,32 +174,35 @@ def run(parent_dir, model, output_dir_, TARGET_SIZE = 128, evaluate=True, verbos
                 minlocalvariance = np.min(localvariance_patch)
                 # FILTER FOR LOCAL VARIANCE
                 localvariance = helpers.localvariance_filter(image=image)
-                np.save(os.path.join(output_dir, name + "_08_localvariance.npy"), localvariance)
-                plt.imsave(os.path.join(output_dir, name + "_08_localvariance.svg"), localvariance, cmap='inferno_r',
+                np.save(os.path.join(output_dir_npy, "08_localvariance.npy"), localvariance)
+                plt.imsave(os.path.join(output_dir_png, "08_localvariance.png"), localvariance, cmap='inferno_r',
+                           vmin=minlocalvariance - 300, vmax=minlocalvariance)
+                plt.imsave(os.path.join(output_dir_svg, "08_localvariance.svg"), localvariance, cmap='inferno_r',
                            vmin=minlocalvariance - 300, vmax=minlocalvariance)
 
                 # SEGMENTING: GET BEST PATCH AND USE IT AS AN EIGENFILTER ON THE IMAGE (will take 2-3min)
                 if verbose:
                     print("Eigenfiltering...")
                 startingtime = time.time()
-                filtered = eigenfiltering(image_def=image, patch_good=best_patch, output_path=os.path.join(output_dir,
-                                                                                                        'eigenfilters', name), blurring=blurring, filter_size=filtersize)
+                filtered = eigenfiltering(image_def=image, patch_good=best_patch, output_path=os.path.join(
+                    output_dir_name,'eigenfilters'), blurring=blurring, filter_size=filtersize)
                 maxfiltered = np.max(filtered)
                 minval = np.min(filtered[filtered > 0])
                 # plt.imshow(filtered, vmin=minval)
                 # # plt.show()
                 # plt.close()
-                np.save(os.path.join(output_dir, name + "symmetry.npy"), filtered)
-                plt.imsave(os.path.join(output_dir, name + "symmetry.svg"), filtered, cmap='viridis', vmin=minval)
+                np.save(os.path.join(output_dir_npy, "09_symmetry.npy"), filtered)
+                plt.imsave(os.path.join(output_dir_png, "09_symmetry.png"), filtered, cmap='viridis', vmin=minval)
+                plt.imsave(os.path.join(output_dir_svg, "09_symmetry.svg"), filtered, cmap='viridis', vmin=minval)
                            # vmax=np.max((22, maxfiltered)))
 
 
             else:
-                localvariance = np.load(os.path.join(output_dir, name + "_08_localvariance.npy"))
-                best_patch = np.load(os.path.join(output_dir, name + "bestpatch.npy"))
-                filtered = np.load(os.path.join(output_dir, name + "symmetry.npy"))
-                fourier_segmentation_total = np.load(os.path.join(output_dir,
-                                                                  name + "fourier_segmentation.npy"))
+                localvariance = np.load(os.path.join(output_dir_name, "08_localvariance.npy"))
+                best_patch = np.load(os.path.join(output_dir_name, "bestpatch.npy"))
+                filtered = np.load(os.path.join(output_dir_name, "symmetry.npy"))
+                fourier_segmentation_total = np.load(os.path.join(output_dir_name,
+                                                                  "fourier_segmentation.npy"))
 
             binarized_symmetry = binarization_symmetry(filtered)
             binarized_localvariance = binarization_localvariance(localvariance, best_patch)
@@ -191,7 +211,7 @@ def run(parent_dir, model, output_dir_, TARGET_SIZE = 128, evaluate=True, verbos
             # plt.imshow(binarized_both)
             # # plt.show()
             # plt.close()
-            np.save(os.path.join(output_dir, name[:-4] + '_binarized.npy'), binarized_both)
+            np.save(os.path.join(output_dir_name, 'binarized.npy'), binarized_both)
 
             if evaluate:
                 border=12
@@ -263,12 +283,18 @@ def run(parent_dir, model, output_dir_, TARGET_SIZE = 128, evaluate=True, verbos
 
 if __name__ == '__main__':
 
-    image_dir = "../data/all_data/defective/images"
-    output_dir = "../output/all_data/fold0"             # Change fold as desired
-    model_path = "../models/all_data2/fold0_20210325-005303/model.h5"
+    # image_dir = "../data/all_data/defective/images"
+    # output_dir = "../output/all_data/fold0"             # Change fold as desired
+    # model_path = "../models/all_data2/fold0_20210325-005303/model.h5"
+    #
+    data_dir_defective = "../data/hrstem_defects_dataset/defective/images"
+    data_dir_nondefective = "../data/hrstem_defects_dataset/non_defective/images"
+    output_dir = "../output/vgg16"  # Change fold as desired
+    model_path = "../models/vgg16/model.h5"
+
     assert os.path.exists(model_path)
     model = load_model(model_path)
-    run(image_dir, model, output_dir)
+    run(data_dir_defective, model, output_dir, run=True, evaluate=False)
 
     print("Done")
     exit()

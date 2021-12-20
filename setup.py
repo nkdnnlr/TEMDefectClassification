@@ -12,15 +12,17 @@ from src.train_cnn import train_cnn
 
 parser = argparse.ArgumentParser()
 # Data structure arguments
-parser.add_argument("-file", "--file", type=str, default="all_data.zip",
+# parser.add_argument("-file", "--file", type=str, default="all_data.zip",
+#                     help="Name of zipped data file.")
+parser.add_argument("-file", "--file", type=str, default="hrstem_defects_dataset.zip",
                     help="Name of zipped data file.")
 parser.add_argument("-unzip", "--unzip", type=bool, default=True,
                     help="Unzip?")
-parser.add_argument("-labels", "--labels", type=bool, default=True,
+parser.add_argument("-labels", "--labels", type=bool, default=False,#True,
                     help="Convert annotations to labels?")
-parser.add_argument("-preprocessing", "--preprocessing", type=bool, default=False,
+parser.add_argument("-preprocessing", "--preprocessing", type=bool, default=True,
                     help="Preprocessing?.")
-parser.add_argument("-train_cnn", "--train_cnn", type=bool, default=False)
+parser.add_argument("-train_cnn", "--train_cnn", type=bool, default=True)
 args = parser.parse_args()
 
 UNZIP = args.unzip
@@ -77,8 +79,8 @@ if LABELS:
     )
     # Get labels for defective images
     get_masks(
-        dir_labels=dir_defective_labels,
         dir_json=dir_defective_json,
+        dir_labels=dir_defective_labels,
         int_dict={'B': 0, 'S': 0.5, 'A': 1},
     )
 
@@ -93,6 +95,3 @@ if PREPROCESSING:
 
 if TRAIN_CNN:
     train_cnn(dir_folds=dir_folds, output_dir=dir_output, n_folds=params["N_FOLDS"])
-
-
-

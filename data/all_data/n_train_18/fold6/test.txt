@@ -1,6 +1,0 @@
-11: JEOL_ADF1_10M_SOU76posB_Tunnel4GrainBoundary1Seed1.tif
-1: JEOL BF defect at Xtal boundaries 01_svm_SOU52 ring right part no annotation.tif
-16: JEOL_ADF1_8M_SOU76posB_Tunnel2Defect1.tif
-24: JEOL_ADF1_10M_SOU76posB_Tunnel4GrainBoundary2Seed3Edge.tif
-15: JEOL_ADF1_10M_SOU76posB_Tunnel5Seed3-4DefectA.tif
-13: JEOL_ADF1_10M_SOU76posB_Tunnel3GrainBoundary2Seed3Edge.tif

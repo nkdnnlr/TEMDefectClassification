@@ -18,7 +18,7 @@ from scipy import signal
 from skimage.morphology import opening, closing, square
 from skimage.measure import label, regionprops
 from skimage.filters import threshold_otsu
-import helpers as helpers
+# import helpers as helpers
 
 def circular_mask(size_x=1024, size_y=1024, cx=512, cy=512, r=50):
     x = np.arange(0, size_x)

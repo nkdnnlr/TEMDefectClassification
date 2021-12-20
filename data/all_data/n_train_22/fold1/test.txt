@@ -1,6 +1,0 @@
-28: JEOL BF defect top left x 10 M a no annotation.tif
-27: JEOL_ADF1_10M_SOU76posB_Tunnel5Seed1DefectMeet1.tif
-9: JEOL BF 12_SIH05 no annotation.tif
-8: JEOL_ADF1_10M_SOU76posB_Tunnel4GrainBoundary3Seed3Edge.tif
-12: JEOL_ADF1_10M_SOU76posB_Tunnel2GrainBoundary1B.tif
-11: JEOL_ADF1_10M_SOU76posB_Tunnel4GrainBoundary1Seed1.tif

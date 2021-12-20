@@ -1,6 +1,0 @@
-4: JEOL BF 14_SIH05 no annotation.tif
-8: JEOL_ADF1_10M_SOU76posB_Tunnel4GrainBoundary3Seed3Edge.tif
-9: JEOL BF 12_SIH05 no annotation.tif
-16: JEOL_ADF1_8M_SOU76posB_Tunnel2Defect1.tif
-22: JEOL_ADF1_10M_SOU76posB_Tunnel4GrainBoundary2Seed2Edge.tif
-6: JEOL BF 05 SF x 10 M no annotation.tif

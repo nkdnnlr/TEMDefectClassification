@@ -1,2 +1,0 @@
-5: JEOL BF 05 SF x 10 M no annotation.tif
-8: JEOL BF 50_SIH05 no annotation.tif

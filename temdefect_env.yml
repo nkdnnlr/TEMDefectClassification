@@ -87,7 +87,6 @@ dependencies:
   - idna=2.8=py37_1000
   - imageio=2.5.0=py37_0
   - importlib_metadata=1.1.0=py37_0
-  - intel-openmp=2019.5=281
   - ipykernel=5.1.2=py37h39e3cac_0
   - ipyparallel=6.2.4=py37_0
   - ipython=7.8.0=py37h39e3cac_0
