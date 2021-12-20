@@ -8,7 +8,7 @@ conda env create -f environment.yml
 ```
 
 ## Data
-The data used for this project is publicly available at [Zenodo](https://dx.doi.org/10.5281/zenodo.4739588). You can either download and use the data provided, or use your own data for re-traing the model and/or for testing the algorithm. 
+The data used for this project is publicly available at [Zenodo](https://doi.org/10.5281/zenodo.5792917). You can either download and use the data provided, or use your own data for re-traing the model and/or for testing the algorithm. 
 
 ## Training Model
 In order to re-train the model, you have to adjust the parameters in `setup.py` to suit your data directories, then simply run 
